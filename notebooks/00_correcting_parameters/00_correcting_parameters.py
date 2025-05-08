@@ -33,7 +33,7 @@ chinchilla_parameters_df["Correct Eqn. Parameters"] = (
 )
 chinchilla_parameters_df["Relative Error Correct Eqn."] = (
     100.0
-    * np.abs(
+    * (
         chinchilla_parameters_df["Reported Parameters"]
         - chinchilla_parameters_df["Correct Eqn. Parameters"]
     )
@@ -41,7 +41,7 @@ chinchilla_parameters_df["Relative Error Correct Eqn."] = (
 )
 chinchilla_parameters_df["Relative Error Incorrect Eqn."] = (
     100.0
-    * np.abs(
+    * (
         chinchilla_parameters_df["Reported Parameters"]
         - chinchilla_parameters_df["Incorrect Eqn. Parameters"]
     )
@@ -64,7 +64,7 @@ sns.scatterplot(
 )
 g.set(
     xscale="log",
-    ylabel="Relative Error (\%)",
+    ylabel=r"$100 * \frac{\text{Reported Params - Calculated Params}}{\text{Reported Params}} $",
 )
 sns.move_legend(g, "upper left", bbox_to_anchor=(1, 1))
 src.plot.save_plot_with_multiple_extensions(
