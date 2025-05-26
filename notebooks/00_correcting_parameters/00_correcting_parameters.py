@@ -18,35 +18,7 @@ data_dir, results_dir = src.analyze.setup_notebook_dir(
     refresh=False,
 )
 
-chinchilla_parameters_df = pd.read_csv("data/chinchilla_model_parameters.csv")
-chinchilla_parameters_df["Reported Parameters"] = (
-    1e6 * chinchilla_parameters_df["Reported Parameters (M)"]
-)
-chinchilla_parameters_df["Incorrect Eqn. Parameters"] = (
-    1e6
-    * chinchilla_parameters_df[
-        "Tied (Un)Embed, No Gating, Incorrect Attn Params Prefactor"
-    ]
-)
-chinchilla_parameters_df["Correct Eqn. Parameters"] = (
-    1e6 * chinchilla_parameters_df["Tied (Un)Embed, No Gating"]
-)
-chinchilla_parameters_df["Relative Error Correct Eqn."] = (
-    100.0
-    * (
-        chinchilla_parameters_df["Reported Parameters"]
-        - chinchilla_parameters_df["Correct Eqn. Parameters"]
-    )
-    / chinchilla_parameters_df["Reported Parameters"]
-)
-chinchilla_parameters_df["Relative Error Incorrect Eqn."] = (
-    100.0
-    * (
-        chinchilla_parameters_df["Reported Parameters"]
-        - chinchilla_parameters_df["Incorrect Eqn. Parameters"]
-    )
-    / chinchilla_parameters_df["Reported Parameters"]
-)
+chinchilla_parameters_df = src.analyze.load_chinchilla_model_parameters_csv()
 
 plt.close()
 plt.figure(figsize=(10, 6))
@@ -109,4 +81,4 @@ src.plot.save_plot_with_multiple_extensions(
 plt.show()
 
 
-print()
+print("Finished 00_correcting_parameters!")
