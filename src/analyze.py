@@ -20,7 +20,7 @@ def compute_or_load_chinchilla_fit_dataframes(
     if os.path.exists(chinchilla_fits_df_path) and os.path.exists(
         chinchilla_tokens_per_parameter_df_path
     ):
-        chinchilla_fits_df = pd.read_csv(chinchilla_fits_df_path)
+        chinchilla_fits_df = pd.read_csv(chinchilla_fits_df_path, index_col=0)
         chinchilla_tokens_per_parameter_df = pd.read_csv(
             chinchilla_tokens_per_parameter_df_path
         )

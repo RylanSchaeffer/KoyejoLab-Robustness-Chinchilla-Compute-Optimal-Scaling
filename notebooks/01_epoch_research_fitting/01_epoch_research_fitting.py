@@ -36,12 +36,59 @@ models_parameters_columns = [
     "Incorrect Eqn. Parameters",
     "Correct Eqn. Parameters",
 ]
-models_parameters_columns_colors = [
-    # "#FFDDDD",
-    "#DDFFDD",
-    "#DDDDFF",
-    "#FFFFDD",
-]  # Light Red, Green, Blue, Yellow
+models_parameters_columns_colors = {
+    models_parameters_column: plt.cm.viridis(i / len(models_parameters_columns))
+    for i, models_parameters_column in enumerate(models_parameters_columns)
+}
+models_parameters_columns_markers = {
+    "Reported Parameters": "o",
+    "Incorrect Eqn. Parameters": "s",
+    "Correct Eqn. Parameters": "d",
+}
+fit_parameters = ["A", "B", "E", "alpha", "beta"]
+
+plt.close()
+fig, axes = plt.subplots(
+    nrows=1,
+    ncols=len(fit_parameters),
+    figsize=(30, 9),
+    sharex=True,
+    sharey=False,
+)
+for ax_idx, (ax, fit_parameter) in enumerate(zip(axes, fit_parameters)):
+    if fit_parameter == "alpha":
+        latex_title = r"$\alpha$"
+    elif fit_parameter == "beta":
+        latex_title = r"$\beta$"
+    else:
+        latex_title = rf"${fit_parameter}$"
+    ax.set_title(latex_title)
+    for col_idx, models_parameters_column in enumerate(models_parameters_columns):
+        ax.errorbar(
+            x=[1 + col_idx],
+            y=[
+                chinchilla_fits_df.loc[fit_parameter + "_fit", models_parameters_column]
+            ],
+            yerr=[
+                1.96
+                * chinchilla_fits_df.loc[
+                    fit_parameter + "_se", models_parameters_column
+                ]
+            ],
+            color=models_parameters_columns_colors[models_parameters_column],
+            marker=models_parameters_columns_markers[models_parameters_column],
+            markersize=20,
+            linewidth=2,
+        )
+    ax.set_xlim((0.5, 3.5))
+    ax.set_xticks([1, 2, 3])  # Set the positions of the ticks
+    ax.set_xticklabels(
+        models_parameters_columns, rotation=45, ha="right"
+    )  # Set the labels and rotate them
+src.plot.save_plot_with_multiple_extensions(
+    plot_dir=results_dir, plot_filename="fit_parameters"
+)
+plt.show()
 
 
 plt.close()
@@ -60,11 +107,19 @@ for ax_idx, (ax, models_parameters_column) in enumerate(
     median = chinchilla_tokens_per_parameter_df[models_parameters_column + " Median"]
     high = chinchilla_tokens_per_parameter_df[models_parameters_column + " High"]
 
-    plot_color = plt.cm.viridis(
-        ax_idx / len(models_parameters_columns)
-    )  # Get a color from a colormap
-    ax.plot(training_flop, median, label=models_parameters_column, color=plot_color)
-    ax.fill_between(training_flop, low, high, color=plot_color, alpha=0.2)
+    ax.plot(
+        training_flop,
+        median,
+        label=models_parameters_column,
+        color=models_parameters_columns_colors[models_parameters_column],
+    )
+    ax.fill_between(
+        training_flop,
+        low,
+        high,
+        color=models_parameters_columns_colors[models_parameters_column],
+        alpha=0.2,
+    )
     ax.set_xlabel("Training Compute (FLOP)")
     if ax_idx == 0:
         ax.set_ylabel("Compute-Optimal\nTokens per Parameter")
@@ -72,18 +127,18 @@ for ax_idx, (ax, models_parameters_column) in enumerate(
     ax.set_xscale("log")
     ax.set_yscale("log")
     ax.set_ylim(1, 100)
-    ax.axhline(y=20, color="gray", linestyle="--")
+    ax.axhline(y=20, color="black", linestyle="--")
     ax.text(
-        x=7e24,
+        x=1e24,
         y=20,
         s=r"$D/N = 20$ rule of thumb",
-        color="gray",
-        fontsize=14,
+        color="black",
+        fontsize=20,
         verticalalignment="bottom",
     )
 
 src.plot.save_plot_with_multiple_extensions(
-    results_dir,
+    plot_dir=results_dir,
     plot_filename="compute_optimal_tokens_per_parameter_by_models_parameters",
 )
 plt.show()
