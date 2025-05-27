@@ -220,7 +220,7 @@ def compute_or_load_chinchilla_fit_dataframes(
         print("\n\n")
 
     chinchilla_fits_df = pd.concat(chinchilla_fits_data).T
-    chinchilla_fits_df.to_csv(chinchilla_fits_df_path, index=False)
+    chinchilla_fits_df.to_csv(chinchilla_fits_df_path)
     chinchilla_tokens_per_parameter_df = pd.concat(
         chinchilla_tokens_per_parameter_data, axis=1
     )
