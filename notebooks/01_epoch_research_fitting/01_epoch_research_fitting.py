@@ -1,4 +1,3 @@
-# Adapted from https://github.com/epoch-research/analyzing-chinchilla/blob/main/data_analysis.ipynb
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
 import numpy as np
@@ -44,7 +43,7 @@ models_parameters_columns_markers = {
     "Incorrect Eqn. Parameters": "s",
     "Correct Eqn. Parameters": "d",
 }
-fit_parameters = ["A", "B", "E", "alpha", "beta"]
+fit_parameters = ["E", "A", "alpha", "B", "beta"]
 
 plt.close()
 fig, axes = plt.subplots(

@@ -1,12 +1,5 @@
-import matplotlib
-from matplotlib.colors import LogNorm
-import matplotlib.scale
-import matplotlib.ticker
-import matplotlib.transforms
 import matplotlib.pyplot as plt
-import numpy as np
 import os
-import pandas as pd
 import seaborn as sns
 
 
