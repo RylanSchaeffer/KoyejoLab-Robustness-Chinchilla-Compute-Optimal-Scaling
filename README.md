@@ -22,7 +22,20 @@
 
 ## Running
 
-Our Chinchilla fitting code was adapted from Epoch AI's [Chinchilla Scaling: A Replication Attempt](https://github.com/epoch-research/analyzing-chinchilla/).
+[00_correcting_parameters.py](notebooks/00_correcting_parameters/00_correcting_parameters.py) produces the relative error of reported parameters vs the "correct" equation and vs the "incorrect" equation:
+
+![y=relative_error_x=reported_parameters_hue=equation.png](notebooks/00_correcting_parameters/results/y%3Drelative_error_x%3Dreported_parameters_hue%3Dequation.png)
+
+[01_epoch_research_fitting.py](notebooks/01_epoch_research_fitting/01_epoch_research_fitting.py) produces the compute-optimal tokens-per-parameter and the estimated neural scaling law parameters:
+
+![compute_optimal_tokens_per_parameter_by_models_parameters.png](notebooks/01_epoch_research_fitting/results/compute_optimal_tokens_per_parameter_by_models_parameters.png)
+
+![fit_parameters.png](notebooks/01_epoch_research_fitting/results/fit_parameters.png)
+
+[02_robustness_analysis.py](notebooks/02_robustness_analysis/02_robustness_analysis.py) produces 
+
+Note: Our [Chinchilla fitting code](src/epoch_research_chinchilla_fit.py) was adapted from Epoch AI's [Chinchilla Scaling: A Replication Attempt](https://github.com/epoch-research/analyzing-chinchilla/).
+We appreciate the authors for open-sourcing their fitting code and for answering our questions. 
 
 
 ## Contributing
