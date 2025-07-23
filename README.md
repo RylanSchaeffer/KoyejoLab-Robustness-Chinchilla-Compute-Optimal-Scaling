@@ -2,7 +2,10 @@
 
 ![](notebooks/01_epoch_research_fitting/results/compute_optimal_tokens_per_parameter_by_models_parameters.png)
 
-## Installation
+[**Installing**](#installing) | [**Running**](#running) | [**Contributing**](#contributingvlm) | [**Citing**](#citing) | [**Contacting**](#contacting)
+
+
+## Installing
 
 1. (Optional) Update conda:
 
@@ -16,11 +19,10 @@
 
 `pip install autograd matplotlib pandas scipy seaborn`
 
-## Credit
-
-Our Chinchilla fitting code was adapted from Epoch AI's [Chinchilla Scaling: A Replication Attempt](https://github.com/epoch-research/analyzing-chinchilla/).
 
 ## Running
+
+Our Chinchilla fitting code was adapted from Epoch AI's [Chinchilla Scaling: A Replication Attempt](https://github.com/epoch-research/analyzing-chinchilla/).
 
 
 ## Contributing
@@ -34,7 +36,7 @@ To cite this work, please use:
 ```bibtex
 ```
 
-## Contact
+## Contacting
 
 Questions? Comments? Interested in collaborating?
 Open an issue or email rschaef@cs.stanford.edu or any of the other authors.
