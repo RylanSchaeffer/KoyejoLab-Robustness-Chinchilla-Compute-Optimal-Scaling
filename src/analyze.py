@@ -1,5 +1,6 @@
 from autograd import grad
 from functools import partial
+import multiprocessing
 import numpy as np
 import os
 import pandas as pd
@@ -8,6 +9,24 @@ from scipy.stats import multivariate_normal
 from typing import List, Tuple
 
 import src.epoch_research_chinchilla_fit
+
+
+def compute_chinchilla_fit_bootstrap_iteration(args):
+    """
+    Performs the optimization for a single bootstrap sample.
+    It takes a single 'args' tuple to be compatible with Pool.map.
+    """
+    # Unpack the arguments
+    indices, init_params, all_parameters, all_tokens, all_losses = args
+
+    result = minimize(
+        src.epoch_research_chinchilla_fit.huber_loss_objective,
+        np.array(init_params),
+        args=(all_parameters[indices], all_tokens[indices], all_losses[indices]),
+        jac=grad(src.epoch_research_chinchilla_fit.huber_loss_objective),
+        method="BFGS",
+    )
+    return result.x
 
 
 def compute_chinchilla_fit_dataframes(
@@ -29,7 +48,7 @@ def compute_chinchilla_fit_dataframes(
 
     # Compute standard errors.
     # Set up the grid for initial parameter values
-    param_list = []
+    param_array = []
     sorted_losses = sorted(losses)
     indices = [
         i
@@ -40,32 +59,43 @@ def compute_chinchilla_fit_dataframes(
         np.random.choice(indices, size=len(indices), replace=True)
         for _ in range(bootstraps)
     ]
-    for num, indices in enumerate(random_indices):
-        best_loss = np.inf
-        best_params = None
 
-        result = minimize(
-            src.epoch_research_chinchilla_fit.huber_loss_objective,
-            np.array(init_params),
-            args=(parameters[indices], tokens[indices], losses[indices]),
-            jac=grad(src.epoch_research_chinchilla_fit.huber_loss_objective),
-            method="BFGS",
-        )
+    # Prepare arguments for each parallel task
+    task_args = [
+        (indices, init_params, parameters, tokens, losses) for indices in random_indices
+    ]
 
-        # best_loss = result.fun
-        # best_params = result.x
-        # # print(f"New best loss: {best_loss}")
-        # # print(f"Best params: {best_params}")
+    with multiprocessing.Pool() as pool:
+        # map() distributes the 'task_args' across the worker processes
+        # and collects the results in a list.
+        param_list = pool.map(compute_chinchilla_fit_bootstrap_iteration, task_args)
 
-        if num % 100 == 99:
-            print("Bootstrap step %d completed" % (num + 1))
+    # for num, indices in enumerate(random_indices):
+    #     best_loss = np.inf
+    #     best_params = None
+    #
+    #     result = minimize(
+    #         src.epoch_research_chinchilla_fit.huber_loss_objective,
+    #         np.array(init_params),
+    #         args=(parameters[indices], tokens[indices], losses[indices]),
+    #         jac=grad(src.epoch_research_chinchilla_fit.huber_loss_objective),
+    #         method="BFGS",
+    #     )
+    #
+    #     # best_loss = result.fun
+    #     # best_params = result.x
+    #     # # print(f"New best loss: {best_loss}")
+    #     # # print(f"Best params: {best_params}")
+    #
+    #     if num % 100 == 99:
+    #         print("Bootstrap step %d completed" % (num + 1))
+    #
+    #     param_array.append(result.x)
 
-        param_list.append(result.x)
-
-    param_list = np.array(param_list)
-    cov_matrix = np.cov(np.transpose(param_list))
+    param_array = np.array(param_list)
+    cov_matrix = np.cov(np.transpose(param_array))
     param_list_untransformed = src.epoch_research_chinchilla_fit.untransform_params(
-        param_list
+        param_array
     )
     cov_matrix_untransformed = np.cov(np.transpose(param_list_untransformed))
     standard_errors_untransformed = np.sqrt(np.diag(cov_matrix_untransformed[:5, :5]))
@@ -103,6 +133,7 @@ def compute_chinchilla_fit_dataframes(
                 standard_errors_untransformed[index],
             )
         )
+    print("\n\n")
 
     fit_data = {
         f"{k}_fit": v for k, v in zip(parameter_labels, estimated_params_untransformed)
@@ -284,19 +315,44 @@ def compute_or_load_chinchilla_robustness_fit_dataframes(
     # This is a gnarly implementation, but I just want something that works quickly and
     # I don't want to have to refactor.
     def parameter_transformation_log_normal_noise(
-        x: np.ndarray, sigma: float, repeat_idx: int
+        parameters: np.ndarray, sigma: float, repeat_idx: int
     ) -> np.ndarray:
-        return x * np.exp(np.random.normal(size=x.shape, loc=0.0, scale=sigma))
+        return parameters * np.exp(
+            np.random.normal(size=parameters.shape, loc=0.0, scale=sigma)
+        )
 
     def parameter_transformation_multiplicative_constant(
-        x: np.ndarray, alpha: float
+        parameters: np.ndarray, c: float
     ) -> np.ndarray:
-        return x * (1.0 + alpha)
+        return parameters * (1.0 + c)
+
+    def parameter_transformation_systematic_bias(
+        parameters: np.ndarray, slope: float
+    ) -> np.ndarray:
+        log_parameters = np.log10(parameters)
+        mean_log_parameters = np.mean(log_parameters)
+        new_parameters = np.power(
+            10.0, slope * (log_parameters - mean_log_parameters) + mean_log_parameters
+        )
+        return new_parameters
 
     parameter_transformation_fns = (
-        {"Increasing Multiplier"}
-        | {
+        {
             "Identity": lambda params: params,
+        }
+        | {
+            f"Systematic Bias (Increasing)_{slope}": partial(
+                parameter_transformation_systematic_bias,
+                slope=slope,
+            )
+            for slope in [1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0]
+        }
+        | {
+            f"Systematic Bias (Decreasing)_{inverse_slope}": partial(
+                parameter_transformation_systematic_bias,
+                slope=1.0 / inverse_slope,
+            )
+            for inverse_slope in [1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0]
         }
         | {
             f"Log Normal Noise_{sigma}_{repeat_idx}": partial(
@@ -304,14 +360,14 @@ def compute_or_load_chinchilla_robustness_fit_dataframes(
                 sigma=sigma,
                 repeat_idx=repeat_idx,
             )
-            for sigma in np.logspace(-2, 2, num=7)
-            for repeat_idx in np.arange(10)
+            for sigma in np.logspace(-2, 2, num=11)
+            for repeat_idx in np.arange(13)
         }
         | {
-            f"Multiplicative Constant_{alpha}": partial(
-                parameter_transformation_multiplicative_constant, alpha=alpha
+            f"Multiplicative Constant_{c}": partial(
+                parameter_transformation_multiplicative_constant, c=c
             )
-            for alpha in np.logspace(-3, 3, num=7)
+            for c in np.logspace(-3, 3, num=11)
         }
     )
 
@@ -400,12 +456,6 @@ def load_epoch_research_svg_extracted_data_csv() -> pd.DataFrame:
         training_df["Training Tokens"] / training_df["Model Size"]
     )
     return training_df
-
-
-def model_parameter_robustness_perturbation(
-    models_parameters: np.ndarray,
-) -> np.ndarray:
-    raise NotImplementedError
 
 
 def setup_notebook_dir(

@@ -27,7 +27,6 @@ chinchilla_fits_df, chinchilla_tokens_per_parameter_df = (
         models_parameters_columns=[
             "Correct Eqn. Parameters",
         ],
-        bootstraps=400,
     )
 )
 
