@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-from matplotlib.ticker import FuncFormatter
 import numpy as np
 import os
 from scipy.optimize import OptimizeWarning
@@ -25,6 +24,14 @@ data_dir, results_dir = src.analyze.setup_notebook_dir(
 chinchilla_fits_df, chinchilla_tokens_per_parameter_df = (
     src.analyze.compute_or_load_chinchilla_fit_dataframes(
         data_dir=data_dir,
+        models_parameters_columns=[
+            "Model Size",
+            "Reported Parameters",
+            "Incorrect Eqn. Parameters",
+            "Correct Eqn. Parameters",
+        ],
+        refresh=False,
+        bootstraps=4000,
     )
 )
 
