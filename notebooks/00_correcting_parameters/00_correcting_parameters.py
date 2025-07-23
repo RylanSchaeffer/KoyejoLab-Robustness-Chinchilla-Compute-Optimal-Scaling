@@ -19,31 +19,79 @@ data_dir, results_dir = src.analyze.setup_notebook_dir(
 )
 
 chinchilla_parameters_df = src.analyze.load_chinchilla_model_parameters_csv()
+chinchilla_parameters_df["Relative Error Reported Parameters"] = 0.0
+
+chinchilla_parameters_relative_error_tall_df = chinchilla_parameters_df[
+    [
+        "Reported Parameters",
+        "Relative Error Reported Parameters",
+        "Relative Error Correct Eqn.",
+        "Relative Error Incorrect Eqn.",
+    ]
+].melt(
+    id_vars="Reported Parameters",
+    var_name="Equation",
+    value_name="Relative Error (\%)",
+)
+chinchilla_parameters_relative_error_tall_df[
+    "Equation"
+] = chinchilla_parameters_relative_error_tall_df["Equation"].map(
+    {
+        "Relative Error Reported Parameters": "Reported",
+        "Relative Error Correct Eqn.": "Correct Eqn.",
+        "Relative Error Incorrect Eqn.": "Incorrect Eqn.",
+    }
+)
+chinchilla_parameters_relative_error_tall_df["Relative Error Is Zero"] = (
+    chinchilla_parameters_relative_error_tall_df["Relative Error (\%)"] == 0
+)
+
+print(
+    chinchilla_parameters_relative_error_tall_df.groupby(["Equation"])[
+        "Relative Error (\%)"
+    ].max()
+)
+
+fraction_relative_error_zero_under_incorrect_eqn = np.mean(
+    chinchilla_parameters_relative_error_tall_df[
+        chinchilla_parameters_relative_error_tall_df["Equation"] == "Incorrect Eqn."
+    ]["Relative Error (\%)"]
+    == 0.0,
+)
+
+# Incorrect Eqn. reduces 0.58 to 0% relative error.
+print(
+    f"Incorrect Eqn. reduces {fraction_relative_error_zero_under_incorrect_eqn} to 0% relative error."
+)
+
+models_parameters_columns_colors = {
+    "Reported": plt.cm.viridis(0.0 / 3.0),
+    "Incorrect Eqn.": plt.cm.viridis(1.0 / 3.0),
+    "Correct Eqn.": plt.cm.viridis(2.0 / 3.0),
+}
 
 plt.close()
-plt.figure(figsize=(10, 6))
-g = sns.scatterplot(
-    data=chinchilla_parameters_df,
+g = sns.relplot(
+    data=chinchilla_parameters_relative_error_tall_df,
     x="Reported Parameters",
-    y="Relative Error Correct Eqn.",
-    label="Correct Eqn.",
+    y="Relative Error (\%)",
+    hue="Equation",
+    palette=models_parameters_columns_colors,
+    col="Equation",
+    col_order=["Correct Eqn.", "Incorrect Eqn.", "Reported"],
+    style="Relative Error Is Zero",
+    size="Relative Error Is Zero",
+    sizes={False: 50, True: 25},
+    legend=False,
+    linewidth=0,
 )
-sns.scatterplot(
-    data=chinchilla_parameters_df,
-    x="Reported Parameters",
-    y="Relative Error Incorrect Eqn.",
-    label="Incorrect Eqn.",
-)
-g.set(
-    xscale="log",
-    ylabel=r"$100 * \frac{\text{Reported Params - Calculated Params}}{\text{Reported Params}} $",
-)
-sns.move_legend(g, "upper left", bbox_to_anchor=(1, 1))
+g.set(xscale="log", xlabel="Reported Model Parameters")
+g.set_titles(col_template="{col_name}")
 src.plot.save_plot_with_multiple_extensions(
     plot_dir=results_dir,
     plot_filename="y=relative_error_x=reported_parameters_hue=equation",
 )
-plt.show()
+# plt.show()
 
 plt.close()
 plt.figure(figsize=(10, 6))
@@ -78,7 +126,7 @@ src.plot.save_plot_with_multiple_extensions(
     plot_dir=results_dir,
     plot_filename="y=calculated_parameters_x=reported_parameters_hue=equation",
 )
-plt.show()
+# plt.show()
 
 
 print("Finished 00_correcting_parameters!")

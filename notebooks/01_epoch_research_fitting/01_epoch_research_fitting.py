@@ -1,5 +1,4 @@
 # Adapted from https://github.com/epoch-research/analyzing-chinchilla/blob/main/data_analysis.ipynb
-# import matplotlib.
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
 import numpy as np
@@ -32,12 +31,12 @@ chinchilla_fits_df, chinchilla_tokens_per_parameter_df = (
 
 models_parameters_columns = [
     # "Model Size",
-    "Reported Parameters",
-    "Incorrect Eqn. Parameters",
     "Correct Eqn. Parameters",
+    "Incorrect Eqn. Parameters",
+    "Reported Parameters",
 ]
 models_parameters_columns_colors = {
-    models_parameters_column: plt.cm.viridis(i / len(models_parameters_columns))
+    models_parameters_column: plt.cm.viridis((2 - i) / len(models_parameters_columns))
     for i, models_parameters_column in enumerate(models_parameters_columns)
 }
 models_parameters_columns_markers = {
@@ -57,11 +56,11 @@ fig, axes = plt.subplots(
 )
 for ax_idx, (ax, fit_parameter) in enumerate(zip(axes, fit_parameters)):
     if fit_parameter == "alpha":
-        latex_title = r"$\alpha$"
+        latex_title = r"$\hat{\alpha}$"
     elif fit_parameter == "beta":
-        latex_title = r"$\beta$"
+        latex_title = r"$\hat{\beta}$"
     else:
-        latex_title = rf"${fit_parameter}$"
+        latex_title = rf"$\hat{{{fit_parameter}}}$"
     ax.set_title(latex_title)
     for col_idx, models_parameters_column in enumerate(models_parameters_columns):
         ax.errorbar(
@@ -83,7 +82,9 @@ for ax_idx, (ax, fit_parameter) in enumerate(zip(axes, fit_parameters)):
     ax.set_xlim((0.5, 3.5))
     ax.set_xticks([1, 2, 3])  # Set the positions of the ticks
     ax.set_xticklabels(
-        models_parameters_columns, rotation=45, ha="right"
+        [col.replace(" Parameters", "") for col in models_parameters_columns],
+        rotation=45,
+        ha="right",
     )  # Set the labels and rotate them
 src.plot.save_plot_with_multiple_extensions(
     plot_dir=results_dir, plot_filename="fit_parameters"
@@ -123,7 +124,7 @@ for ax_idx, (ax, models_parameters_column) in enumerate(
     ax.set_xlabel("Training Compute (FLOP)")
     if ax_idx == 0:
         ax.set_ylabel("Compute-Optimal\nTokens per Parameter")
-    ax.set_title(models_parameters_column)
+    ax.set_title(models_parameters_column.replace(" Parameters", ""))
     ax.set_xscale("log")
     ax.set_yscale("log")
     ax.set_ylim(1, 100)
