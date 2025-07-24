@@ -61,6 +61,7 @@ fig, axes = plt.subplots(
     sharey=False,
 )
 for ax_idx, (ax, fit_parameter) in enumerate(zip(axes, fit_parameters)):
+    # Set the axes titles.
     if fit_parameter == "alpha":
         latex_title = r"$\hat{\alpha}$"
     elif fit_parameter == "beta":
@@ -68,6 +69,19 @@ for ax_idx, (ax, fit_parameter) in enumerate(zip(axes, fit_parameters)):
     else:
         latex_title = rf"$\hat{{{fit_parameter}}}$"
     ax.set_title(latex_title)
+
+    # Control the y limits.
+    if fit_parameter == "E":
+        ax.set_ylim(1.74, 1.86)
+    elif fit_parameter == "A":
+        ax.set_ylim(0, 1000)
+    elif fit_parameter == "alpha":
+        ax.set_ylim(0.30, 0.42)
+    elif fit_parameter == "B":
+        ax.set_ylim(-1000, 5000)
+    elif fit_parameter == "beta":
+        ax.set_ylim(0.30, 0.42)
+
     for col_idx, models_parameters_column in enumerate(models_parameters_columns):
         ax.errorbar(
             x=[1 + col_idx],
@@ -148,5 +162,5 @@ src.plot.save_plot_with_multiple_extensions(
     plot_dir=results_dir,
     plot_filename="compute_optimal_tokens_per_parameter_by_models_parameters",
 )
-plt.show()
+# plt.show()
 print("Finished 01_epoch_research_fitting!")
