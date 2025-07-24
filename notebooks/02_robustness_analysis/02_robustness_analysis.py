@@ -34,7 +34,7 @@ chinchilla_fits_df, chinchilla_tokens_per_parameter_df = (
 fit_parameters = ["E", "A", "alpha", "B", "beta"]
 
 
-# Plot Multiplicative Constant parameter fits.
+# Extract the Multiplicative Constant parameter fits.
 multiplicative_constant_columns = [
     col
     for col in chinchilla_fits_df.columns
@@ -46,6 +46,63 @@ multiplicative_constant_fits_df = chinchilla_fits_df[
 multiplicative_constant_fits_df.loc["Constant"] = [
     float(col.split("_")[2]) for col in multiplicative_constant_columns
 ]
+
+
+# Create the colormap for multiplicative constants.
+cmap = matplotlib.colormaps.get_cmap("rocket")
+constants = multiplicative_constant_fits_df.T["Constant"].values
+constants_to_colors_dict = {
+    constant: cmap(i / len(constants)) for i, constant in enumerate(constants)
+}
+
+plt.close()
+fig = plt.figure(
+    figsize=(12, 6),
+)
+ax = plt.gca()
+training_flop = chinchilla_tokens_per_parameter_df["Training Compute (FLOP)"]
+for models_parameters_column in multiplicative_constant_columns:
+    low = chinchilla_tokens_per_parameter_df[models_parameters_column + "_Low"]
+    median = chinchilla_tokens_per_parameter_df[models_parameters_column + "_Median"]
+    high = chinchilla_tokens_per_parameter_df[models_parameters_column + "_High"]
+    constant = float(models_parameters_column.split("_")[2])
+    ax.plot(
+        training_flop,
+        median,
+        label=np.round(constant, 3),
+        color=constants_to_colors_dict[constant],
+    )
+    ax.fill_between(
+        training_flop,
+        low,
+        high,
+        color=constants_to_colors_dict[constant],
+        alpha=0.2,
+    )
+ax.set_xlabel("Training Compute (FLOP)")
+ax.set_ylabel("Compute-Optimal\nTokens per Parameter")
+ax.set_title("Multiplicative Constant")
+ax.set_xscale("log")
+ax.set_yscale("log")
+ax.set_ylim(1e-2, 1e2)
+ax.axhline(y=20, color="black", linestyle="--")
+ax.text(
+    x=1e24,
+    y=20,
+    s=r"$D/N = 20$ rule of thumb",
+    color="black",
+    fontsize=20,
+    verticalalignment="bottom",
+)
+ax.legend(title=r"Constant ($c$)", loc="center left", bbox_to_anchor=(1, 0.5))
+fig.subplots_adjust(right=0.8)
+src.plot.save_plot_with_multiple_extensions(
+    plot_dir=results_dir,
+    plot_filename="compute_optimal_tokens_per_parameter_by_compute_multiplicative_constant",
+)
+plt.show()
+
+# Plot the fit parameters for multiplicative constants.
 plt.close()
 fig, axes = plt.subplots(
     nrows=1,
@@ -54,12 +111,6 @@ fig, axes = plt.subplots(
     sharex=True,
     sharey=False,
 )
-cmap = matplotlib.colormaps.get_cmap("rocket")
-constants = multiplicative_constant_fits_df.T["Constant"].values
-# slopes_to_colors_dict = {slope: cmap(slope) for slope in slopes}
-slopes_to_colors_dict = {
-    constant: cmap(i / len(constants)) for i, constant in enumerate(constants)
-}
 for ax_idx, (ax, fit_parameter) in enumerate(zip(axes, fit_parameters)):
     # Set the axes titles.
     if fit_parameter == "alpha":
@@ -97,7 +148,7 @@ for ax_idx, (ax, fit_parameter) in enumerate(zip(axes, fit_parameters)):
                     fit_parameter + "_se", systematic_bias_column
                 ]
             ],
-            color=slopes_to_colors_dict[
+            color=constants_to_colors_dict[
                 multiplicative_constant_fits_df.loc["Constant", systematic_bias_column]
             ],
             marker="d",
@@ -107,7 +158,7 @@ for ax_idx, (ax, fit_parameter) in enumerate(zip(axes, fit_parameters)):
 
     ax.set_xscale("log")
     ax.set_xlabel(r"Constant ($c$)")
-    ax.set_xlim(1e-3, 1e3)
+    ax.set_xlim(1.0 / 3e3, 3e3)
 src.plot.save_plot_with_multiple_extensions(
     plot_dir=results_dir, plot_filename="fit_parameters_multiplicative_constant"
 )

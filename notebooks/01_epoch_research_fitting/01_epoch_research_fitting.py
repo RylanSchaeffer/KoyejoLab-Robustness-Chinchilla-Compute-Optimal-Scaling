@@ -160,7 +160,7 @@ for ax_idx, (ax, models_parameters_column) in enumerate(
 
 src.plot.save_plot_with_multiple_extensions(
     plot_dir=results_dir,
-    plot_filename="compute_optimal_tokens_per_parameter_by_models_parameters",
+    plot_filename="compute_optimal_tokens_per_parameter_by_compute",
 )
 # plt.show()
 print("Finished 01_epoch_research_fitting!")
