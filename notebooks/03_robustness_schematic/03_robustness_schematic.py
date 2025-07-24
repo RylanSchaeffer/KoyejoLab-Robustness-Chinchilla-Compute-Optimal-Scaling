@@ -25,11 +25,9 @@ correct_eqn_parameters = chinchilla_parameters_df["Correct Eqn. Parameters"].val
 min_lim_val = correct_eqn_parameters.min()
 max_lim_val = correct_eqn_parameters.max()
 
-sigmas = [0.0] + np.logspace(-0.5, 0.5, num=10).tolist()
-multiplicative_constants = np.logspace(-3, 3, num=11)
-slopes = np.logspace(-0.5, 0.5, 11)
 
 # Create the colormap for log normal noise.
+sigmas = [0.0] + np.logspace(-0.5, 0.5, num=10).tolist()
 cmap = matplotlib.colormaps.get_cmap("crest")
 sigmas_to_colors_dict = {sigma: cmap(i / len(sigmas)) for i, sigma in enumerate(sigmas)}
 # Plot the effect of the log normal noise.
@@ -55,7 +53,7 @@ for sigma in sigmas:
 # )
 plt.legend(title=r"Noise ($\sigma$)", loc="center left", bbox_to_anchor=(1, 0.5))
 plt.xscale("log")
-plt.xlabel("Correct Eqn. Model Parameters")
+plt.xlabel("True Model Parameters")
 plt.yscale("log")
 plt.ylabel("Perturbed Model Parameters")
 plt.title("Log Normal Noise")
@@ -64,10 +62,61 @@ src.plot.save_plot_with_multiple_extensions(
     plot_dir=results_dir,
     plot_filename="y=perturbed-params_x=params_log_normal_noise",
 )
-plt.show()
+# plt.show()
+
+# Create the colormap for additive constant perturbations.
+additive_constants = (
+    (-np.logspace(6.6, 7.6, num=5)).tolist()
+    + [0]
+    + np.logspace(6.6, 7.6, num=5).tolist()
+)
+cmap = matplotlib.colormaps.get_cmap("flare")
+additive_constants_to_colors_dict = {
+    constant: cmap(i / len(additive_constants))
+    for i, constant in enumerate(additive_constants)
+}
+
+
+def sci_notation_trimmed(x: float, sig: int = 1) -> str:
+    s = f"{x:.{sig}e}"
+    base, exp = s.split("e")
+    exp = int(exp)  # convert to int to remove + and leading zeros
+    return f"{base}e{exp}"
+
+
+# Plot the effect of the multiplicative constant perturbations.
+plt.close()
+fig = plt.figure(figsize=(10, 8))
+for additive_constant in additive_constants:
+    plt.plot(
+        correct_eqn_parameters,
+        src.analyze.parameter_transformation_additive_constant(
+            parameters=correct_eqn_parameters,
+            additive_constant=additive_constant,
+        ),
+        label=sci_notation_trimmed(additive_constant),
+        color=additive_constants_to_colors_dict[additive_constant],
+    )
+# plt.plot(
+#     [min_lim_val, max_lim_val], [min_lim_val, max_lim_val], linestyle="--", color="k"
+# )
+plt.legend(title=r"Constant ($c$)", loc="center left", bbox_to_anchor=(1, 0.5))
+plt.xscale("log")
+plt.xlabel("True Model Parameters")
+plt.yscale("log")
+plt.ylabel("Perturbed Model Parameters")
+plt.title("Additive Constant")
+fig.subplots_adjust(right=0.8)
+src.plot.save_plot_with_multiple_extensions(
+    plot_dir=results_dir,
+    plot_filename="y=perturbed-params_x=params_additive_constant",
+)
+# plt.show()
 
 
 # Create the colormap for multiplicative constant perturbations.
+multiplicative_constants = np.logspace(-3, 3, num=11)
+
 cmap = matplotlib.colormaps.get_cmap("rocket")
 multiplicative_constants_to_colors_dict = {
     constant: cmap(i / len(multiplicative_constants))
@@ -81,7 +130,7 @@ for multiplicative_constant in multiplicative_constants:
         correct_eqn_parameters,
         src.analyze.parameter_transformation_multiplicative_constant(
             parameters=correct_eqn_parameters,
-            c=multiplicative_constant,
+            multiplicative_constant=multiplicative_constant,
         ),
         label=np.round(multiplicative_constant, 3),
         color=multiplicative_constants_to_colors_dict[multiplicative_constant],
@@ -91,7 +140,7 @@ for multiplicative_constant in multiplicative_constants:
 # )
 plt.legend(title=r"Constant ($c$)", loc="center left", bbox_to_anchor=(1, 0.5))
 plt.xscale("log")
-plt.xlabel("Correct Eqn. Model Parameters")
+plt.xlabel("True Model Parameters")
 plt.yscale("log")
 plt.ylabel("Perturbed Model Parameters")
 plt.title("Multiplicative Constant")
@@ -100,12 +149,12 @@ src.plot.save_plot_with_multiple_extensions(
     plot_dir=results_dir,
     plot_filename="y=perturbed-params_x=params_multiplicative_constant",
 )
-plt.show()
+# plt.show()
 
 
+slopes = np.logspace(-0.5, 0.5, 11)
 cmap = matplotlib.colormaps.get_cmap("mako")
 slopes_to_colors_dict = {slope: cmap(i / len(slopes)) for i, slope in enumerate(slopes)}
-
 plt.close()
 fig = plt.figure(figsize=(10, 8))
 for slope in slopes:
@@ -120,7 +169,7 @@ for slope in slopes:
     )
 plt.legend(title=r"Slope ($s$)", loc="center left", bbox_to_anchor=(1, 0.5))
 plt.xscale("log")
-plt.xlabel("Correct Eqn. Model Parameters")
+plt.xlabel("True Model Parameters")
 plt.yscale("log")
 plt.ylabel("Perturbed Model Parameters")
 plt.title("Systematic Bias")
@@ -129,6 +178,6 @@ src.plot.save_plot_with_multiple_extensions(
     plot_dir=results_dir,
     plot_filename="y=perturbed-params_x=params_systematic_bias",
 )
-plt.show()
+# plt.show()
 
 print("Finished 03_robustness_schematic!")

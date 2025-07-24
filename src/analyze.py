@@ -313,6 +313,12 @@ def compute_or_load_chinchilla_robustness_fit_dataframes(
         right_on="Reported Parameters (M)",
     )
 
+    additive_constants = (
+        (-np.logspace(6.6, 7.6, num=5)).tolist()
+        + [0]
+        + np.logspace(6.6, 7.6, num=5).tolist()
+    )
+
     parameter_transformation_fns = (
         {
             "Identity": lambda params: params,
@@ -338,6 +344,12 @@ def compute_or_load_chinchilla_robustness_fit_dataframes(
                 parameter_transformation_multiplicative_constant, c=c
             )
             for c in np.logspace(-3, 3, num=11)
+        }
+        | {
+            f"Additive Constant_{c}": partial(
+                parameter_transformation_additive_constant, c=c
+            )
+            for c in additive_constants
         }
     )
 
@@ -431,6 +443,12 @@ def load_epoch_research_svg_extracted_data_csv() -> pd.DataFrame:
 
 # This is a gnarly implementation, but I just want something that works quickly and
 # I don't want to have to refactor.
+def parameter_transformation_additive_constant(
+    parameters: np.ndarray, additive_constant: float
+) -> np.ndarray:
+    return parameters - additive_constant
+
+
 def parameter_transformation_log_normal_noise(
     parameters: np.ndarray, sigma: float, repeat_idx: int
 ) -> np.ndarray:
@@ -440,9 +458,9 @@ def parameter_transformation_log_normal_noise(
 
 
 def parameter_transformation_multiplicative_constant(
-    parameters: np.ndarray, c: float
+    parameters: np.ndarray, multiplicative_constant: float
 ) -> np.ndarray:
-    return parameters * c
+    return parameters * multiplicative_constant
 
 
 def parameter_transformation_systematic_bias(
