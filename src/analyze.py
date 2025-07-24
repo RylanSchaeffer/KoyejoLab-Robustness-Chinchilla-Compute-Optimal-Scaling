@@ -341,18 +341,11 @@ def compute_or_load_chinchilla_robustness_fit_dataframes(
             "Identity": lambda params: params,
         }
         | {
-            f"Systematic Bias (Increasing)_{slope}": partial(
+            f"Systematic Bias_{slope}": partial(
                 parameter_transformation_systematic_bias,
                 slope=slope,
             )
-            for slope in [1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0]
-        }
-        | {
-            f"Systematic Bias (Decreasing)_{inverse_slope}": partial(
-                parameter_transformation_systematic_bias,
-                slope=1.0 / inverse_slope,
-            )
-            for inverse_slope in [1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0]
+            for slope in np.logspace(-0.5, 0.5, 13)
         }
         | {
             f"Log Normal Noise_{sigma}_{repeat_idx}": partial(
