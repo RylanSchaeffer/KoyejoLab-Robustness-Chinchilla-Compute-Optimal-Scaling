@@ -25,6 +25,7 @@ def compute_chinchilla_fit_bootstrap_iteration(args):
         args=(all_parameters[indices], all_tokens[indices], all_losses[indices]),
         jac=grad(src.epoch_research_chinchilla_fit.huber_loss_objective),
         method="BFGS",
+        options={"maxiter": 10000},
     )
     return result.x
 
@@ -312,30 +313,6 @@ def compute_or_load_chinchilla_robustness_fit_dataframes(
         right_on="Reported Parameters (M)",
     )
 
-    # This is a gnarly implementation, but I just want something that works quickly and
-    # I don't want to have to refactor.
-    def parameter_transformation_log_normal_noise(
-        parameters: np.ndarray, sigma: float, repeat_idx: int
-    ) -> np.ndarray:
-        return parameters * np.exp(
-            np.random.normal(size=parameters.shape, loc=0.0, scale=sigma)
-        )
-
-    def parameter_transformation_multiplicative_constant(
-        parameters: np.ndarray, c: float
-    ) -> np.ndarray:
-        return parameters * (1.0 + c)
-
-    def parameter_transformation_systematic_bias(
-        parameters: np.ndarray, slope: float
-    ) -> np.ndarray:
-        log_parameters = np.log10(parameters)
-        mean_log_parameters = np.mean(log_parameters)
-        new_parameters = np.power(
-            10.0, slope * (log_parameters - mean_log_parameters) + mean_log_parameters
-        )
-        return new_parameters
-
     parameter_transformation_fns = (
         {
             "Identity": lambda params: params,
@@ -431,6 +408,7 @@ def load_chinchilla_model_parameters_csv() -> pd.DataFrame:
         )
         / chinchilla_parameters_df["Reported Parameters"]
     )
+    chinchilla_parameters_df["Relative Error Reported Parameters"] = 0.0
     return chinchilla_parameters_df
 
 
@@ -449,6 +427,33 @@ def load_epoch_research_svg_extracted_data_csv() -> pd.DataFrame:
         training_df["Training Tokens"] / training_df["Model Size"]
     )
     return training_df
+
+
+# This is a gnarly implementation, but I just want something that works quickly and
+# I don't want to have to refactor.
+def parameter_transformation_log_normal_noise(
+    parameters: np.ndarray, sigma: float, repeat_idx: int
+) -> np.ndarray:
+    return parameters * np.exp(
+        np.random.normal(size=parameters.shape, loc=0.0, scale=sigma)
+    )
+
+
+def parameter_transformation_multiplicative_constant(
+    parameters: np.ndarray, c: float
+) -> np.ndarray:
+    return parameters * c
+
+
+def parameter_transformation_systematic_bias(
+    parameters: np.ndarray, slope: float
+) -> np.ndarray:
+    log_parameters = np.log10(parameters)
+    mean_log_parameters = np.mean(log_parameters)
+    new_parameters = np.power(
+        10.0, slope * (log_parameters - mean_log_parameters) + mean_log_parameters
+    )
+    return new_parameters
 
 
 def setup_notebook_dir(

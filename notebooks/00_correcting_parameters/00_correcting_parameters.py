@@ -19,7 +19,6 @@ data_dir, results_dir = src.analyze.setup_notebook_dir(
 )
 
 chinchilla_parameters_df = src.analyze.load_chinchilla_model_parameters_csv()
-chinchilla_parameters_df["Relative Error Reported Parameters"] = 0.0
 
 chinchilla_parameters_relative_error_tall_df = chinchilla_parameters_df[
     [
