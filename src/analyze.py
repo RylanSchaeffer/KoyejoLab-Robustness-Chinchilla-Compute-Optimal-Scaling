@@ -345,16 +345,16 @@ def compute_or_load_chinchilla_robustness_fit_dataframes(
                 parameter_transformation_systematic_bias,
                 slope=slope,
             )
-            for slope in np.logspace(-0.5, 0.5, 13)
+            for slope in np.logspace(-0.5, 0.5, 11)
         }
         | {
-            f"Log Normal Noise_{sigma}_{repeat_idx}": partial(
+            f"Log Normal Noise_{sigma}": partial(
                 parameter_transformation_log_normal_noise,
                 sigma=sigma,
                 repeat_idx=repeat_idx,
             )
             for sigma in np.logspace(-2, 2, num=11)
-            for repeat_idx in np.arange(13)
+            for repeat_idx in np.arange(1)
         }
         | {
             f"Multiplicative Constant_{c}": partial(

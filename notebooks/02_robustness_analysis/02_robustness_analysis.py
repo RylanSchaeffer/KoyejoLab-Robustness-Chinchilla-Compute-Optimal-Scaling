@@ -48,17 +48,16 @@ multiplicative_constant_fits_df.loc["Constant"] = [
 ]
 
 
-# Create the colormap for multiplicative constants.
+# Create the colormap for multiplicative constant perturbations.
 cmap = matplotlib.colormaps.get_cmap("rocket")
 constants = multiplicative_constant_fits_df.T["Constant"].values
 constants_to_colors_dict = {
     constant: cmap(i / len(constants)) for i, constant in enumerate(constants)
 }
 
+# Plot the compute-optimal tokens per parameter for multiplicative constant perturbations.
 plt.close()
-fig = plt.figure(
-    figsize=(12, 6),
-)
+fig = plt.figure(figsize=(12, 6))
 ax = plt.gca()
 training_flop = chinchilla_tokens_per_parameter_df["Training Compute (FLOP)"]
 for models_parameters_column in multiplicative_constant_columns:
@@ -100,9 +99,9 @@ src.plot.save_plot_with_multiple_extensions(
     plot_dir=results_dir,
     plot_filename="compute_optimal_tokens_per_parameter_by_compute_multiplicative_constant",
 )
-plt.show()
+# plt.show()
 
-# Plot the fit parameters for multiplicative constants.
+# Plot the fit parameters for multiplicative constant perturbation.
 plt.close()
 fig, axes = plt.subplots(
     nrows=1,
@@ -162,7 +161,7 @@ for ax_idx, (ax, fit_parameter) in enumerate(zip(axes, fit_parameters)):
 src.plot.save_plot_with_multiple_extensions(
     plot_dir=results_dir, plot_filename="fit_parameters_multiplicative_constant"
 )
-plt.show()
+# plt.show()
 
 # Plot Systematic Bias parameter fits.
 systematic_bias_columns = [
@@ -176,6 +175,57 @@ systematic_bias_fits_df.loc["Slope"] = [
     float(col.split("_")[2]) for col in systematic_bias_columns
 ]
 
+cmap = matplotlib.colormaps.get_cmap("mako")
+slopes = systematic_bias_fits_df.T["Slope"].values
+slopes_to_colors_dict = {slope: cmap(i / len(slopes)) for i, slope in enumerate(slopes)}
+
+# Plot the compute-optimal tokens per parameter for systematic bias perturbations.
+plt.close()
+fig = plt.figure(figsize=(12, 6))
+ax = plt.gca()
+training_flop = chinchilla_tokens_per_parameter_df["Training Compute (FLOP)"]
+for systematic_bias_column in systematic_bias_columns:
+    low = chinchilla_tokens_per_parameter_df[systematic_bias_column + "_Low"]
+    median = chinchilla_tokens_per_parameter_df[systematic_bias_column + "_Median"]
+    high = chinchilla_tokens_per_parameter_df[systematic_bias_column + "_High"]
+    slope = float(systematic_bias_column.split("_")[2])
+    ax.plot(
+        training_flop,
+        median,
+        label=np.round(slope, 3),
+        color=slopes_to_colors_dict[slope],
+    )
+    ax.fill_between(
+        training_flop,
+        low,
+        high,
+        color=slopes_to_colors_dict[slope],
+        alpha=0.2,
+    )
+ax.set_xlabel("Training Compute (FLOP)")
+ax.set_ylabel("Compute-Optimal\nTokens per Parameter")
+ax.set_title("Systematic Bias")
+ax.set_xscale("log")
+ax.set_yscale("log")
+ax.set_ylim(1e-1, 1e4)
+ax.axhline(y=20, color="black", linestyle="--")
+ax.text(
+    x=1e24,
+    y=20,
+    s=r"$D/N = 20$ rule of thumb",
+    color="black",
+    fontsize=20,
+    verticalalignment="bottom",
+)
+ax.legend(title=r"Slope ($s$)", loc="center left", bbox_to_anchor=(1, 0.5))
+fig.subplots_adjust(right=0.8)
+src.plot.save_plot_with_multiple_extensions(
+    plot_dir=results_dir,
+    plot_filename="compute_optimal_tokens_per_parameter_by_compute_systematic_bias",
+)
+plt.show()
+
+# Plot the fit parameters for systematic bias perturbation.
 plt.close()
 fig, axes = plt.subplots(
     nrows=1,
@@ -184,14 +234,6 @@ fig, axes = plt.subplots(
     sharex=True,
     sharey=False,
 )
-cmap = matplotlib.colormaps.get_cmap("mako")
-slopes = systematic_bias_fits_df.T["Slope"].values
-norm = matplotlib.colors.LogNorm(
-    vmin=slopes.min(),
-    vmax=slopes.max(),
-)
-# slopes_to_colors_dict = {slope: cmap(slope) for slope in slopes}
-slopes_to_colors_dict = {slope: cmap(i / len(slopes)) for i, slope in enumerate(slopes)}
 for ax_idx, (ax, fit_parameter) in enumerate(zip(axes, fit_parameters)):
     # Set the axes titles.
     if fit_parameter == "alpha":
