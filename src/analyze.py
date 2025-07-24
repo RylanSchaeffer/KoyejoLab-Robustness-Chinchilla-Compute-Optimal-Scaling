@@ -446,7 +446,7 @@ def load_epoch_research_svg_extracted_data_csv() -> pd.DataFrame:
 def parameter_transformation_additive_constant(
     parameters: np.ndarray, additive_constant: float
 ) -> np.ndarray:
-    return parameters - additive_constant
+    return parameters + additive_constant
 
 
 def parameter_transformation_log_normal_noise(
