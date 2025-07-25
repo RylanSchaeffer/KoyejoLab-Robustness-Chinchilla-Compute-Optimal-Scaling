@@ -341,13 +341,14 @@ def compute_or_load_chinchilla_robustness_fit_dataframes(
         }
         | {
             f"Multiplicative Constant_{c}": partial(
-                parameter_transformation_multiplicative_constant, c=c
+                parameter_transformation_multiplicative_constant,
+                multiplicative_constant=c,
             )
             for c in np.logspace(-3, 3, num=11)
         }
         | {
             f"Additive Constant_{c}": partial(
-                parameter_transformation_additive_constant, c=c
+                parameter_transformation_additive_constant, additive_constant=c
             )
             for c in additive_constants
         }
@@ -472,6 +473,13 @@ def parameter_transformation_systematic_bias(
         10.0, slope * (log_parameters - mean_log_parameters) + mean_log_parameters
     )
     return new_parameters
+
+
+def sci_notation_trimmed(x: float, sig: int = 1) -> str:
+    s = f"{x:.{sig}e}"
+    base, exp = s.split("e")
+    exp = int(exp)  # convert to int to remove + and leading zeros
+    return f"{base}e{exp}"
 
 
 def setup_notebook_dir(

@@ -77,13 +77,6 @@ additive_constants_to_colors_dict = {
 }
 
 
-def sci_notation_trimmed(x: float, sig: int = 1) -> str:
-    s = f"{x:.{sig}e}"
-    base, exp = s.split("e")
-    exp = int(exp)  # convert to int to remove + and leading zeros
-    return f"{base}e{exp}"
-
-
 # Plot the effect of the multiplicative constant perturbations.
 plt.close()
 fig = plt.figure(figsize=(10, 8))
@@ -94,7 +87,7 @@ for additive_constant in additive_constants:
             parameters=correct_eqn_parameters,
             additive_constant=additive_constant,
         ),
-        label=sci_notation_trimmed(additive_constant),
+        label=src.analyze.sci_notation_trimmed(additive_constant),
         color=additive_constants_to_colors_dict[additive_constant],
     )
 # plt.plot(
