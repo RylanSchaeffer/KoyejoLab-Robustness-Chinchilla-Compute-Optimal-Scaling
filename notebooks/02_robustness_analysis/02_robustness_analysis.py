@@ -157,7 +157,7 @@ for ax_idx, (ax, fit_parameter) in enumerate(zip(axes, fit_parameters)):
 src.plot.save_plot_with_multiple_extensions(
     plot_dir=results_dir, plot_filename="fit_parameters_additive_constant"
 )
-plt.show()
+# plt.show()
 
 
 # Extract the Multiplicative Constant parameter fits.
