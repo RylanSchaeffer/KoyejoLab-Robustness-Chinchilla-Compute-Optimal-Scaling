@@ -35,10 +35,34 @@ chinchilla_fits_df, chinchilla_tokens_per_parameter_df = (
     )
 )
 
+# Modernize the column names.
+chinchilla_fits_df.columns = [
+    "Model Size",
+    "Reported Parameters",
+    "Best Fit Formula Parameters",
+    "Correct Formula Parameters",
+]
+chinchilla_tokens_per_parameter_df_replacement_columns = []
+for column in chinchilla_tokens_per_parameter_df.columns:
+    if column.startswith("Incorrect Eqn. Parameters"):
+        chinchilla_tokens_per_parameter_df_replacement_columns.append(
+            column.replace("Incorrect Eqn. Parameters", "Best Fit Formula Parameters")
+        )
+    elif column.startswith("Correct Eqn. Parameters"):
+        chinchilla_tokens_per_parameter_df_replacement_columns.append(
+            column.replace("Correct Eqn. Parameters", "Correct Formula Parameters")
+        )
+    else:
+        chinchilla_tokens_per_parameter_df_replacement_columns.append(column)
+
+chinchilla_tokens_per_parameter_df.columns = (
+    chinchilla_tokens_per_parameter_df_replacement_columns
+)
+
 models_parameters_columns = [
     # "Model Size",
-    "Correct Eqn. Parameters",
-    "Incorrect Eqn. Parameters",
+    "Correct Formula Parameters",
+    "Best Fit Formula Parameters",
     "Reported Parameters",
 ]
 models_parameters_columns_colors = {
@@ -47,10 +71,11 @@ models_parameters_columns_colors = {
 }
 models_parameters_columns_markers = {
     "Reported Parameters": "o",
-    "Incorrect Eqn. Parameters": "s",
-    "Correct Eqn. Parameters": "d",
+    "Best Fit Formula Parameters": "s",
+    "Correct Formula Parameters": "d",
 }
 fit_parameters = ["E", "A", "alpha", "B", "beta"]
+
 
 plt.close()
 fig, axes = plt.subplots(

@@ -125,6 +125,7 @@ fig, axes = plt.subplots(
     sharex=True,
     sharey=False,
 )
+sorted_unique_log_normal_noise_sigmas = sorted(np.unique(log_normal_noise_sigmas))
 for ax_idx, (ax, fit_parameter) in enumerate(zip(axes, fit_parameters)):
     # Set the axes titles.
     if fit_parameter == "alpha":
@@ -134,23 +135,25 @@ for ax_idx, (ax, fit_parameter) in enumerate(zip(axes, fit_parameters)):
     else:
         latex_title = rf"$\hat{{{fit_parameter}}}$"
     ax.set_title(latex_title)
-    # # Control the y limits.
+    # Control the y limits.
     if fit_parameter == "E":
         ax.set_ylim(0.0, 2.50)
         pass
     elif fit_parameter == "A":
-        # ax.set_ylim(1e1, 1e4)
+        ax.set_ylim(1e0, 1e4)
         ax.set_yscale("log")
     elif fit_parameter == "alpha":
-        # ax.set_ylim(0.30, 0.42)
+        ax.set_ylim(0.05, 1.3)
         pass
     elif fit_parameter == "B":
-        # ax.set_ylim(-1000, 5000)
-        pass
+        ax.set_ylim(-4000, 8000)
+        # pass
     elif fit_parameter == "beta":
         ax.set_ylim(0.10, 0.50)
         # pass
-    for col_idx, log_normal_noise_sigma in enumerate(log_normal_noise_sigmas):
+    for col_idx, log_normal_noise_sigma in enumerate(
+        sorted_unique_log_normal_noise_sigmas
+    ):
         sigma_columns = [
             col
             for col in log_normal_noise_columns
@@ -177,15 +180,20 @@ for ax_idx, (ax, fit_parameter) in enumerate(zip(axes, fit_parameters)):
             markersize=20,
             linewidth=2,
         )
+    # ax.set_xlim(0.0, log_normal_noise_sigmas[log_normal_noise_sigmas > 0].max())
     ax.set_xscale(
         "symlog",
-        linthresh=log_normal_noise_sigmas[log_normal_noise_sigmas > 0].min() / 2.0,
+        linthresh=sorted_unique_log_normal_noise_sigmas[1],
+        linscale=np.log10(
+            sorted_unique_log_normal_noise_sigmas[2]
+            / sorted_unique_log_normal_noise_sigmas[1]
+        ),
     )
     ax.set_xlabel(r"Sigma ($\sigma$)")
 src.plot.save_plot_with_multiple_extensions(
     plot_dir=results_dir, plot_filename="fit_parameters_log_normal_noise"
 )
-plt.show()
+# plt.show()
 
 
 # Extract the Additive Constant parameter fits.
@@ -277,13 +285,12 @@ for ax_idx, (ax, fit_parameter) in enumerate(zip(axes, fit_parameters)):
         ax.set_ylim(0.0, 2.50)
         pass
     elif fit_parameter == "A":
-        # ax.set_ylim(1e1, 1e4)
+        ax.set_ylim(1e0, 1e4)
         ax.set_yscale("log")
     elif fit_parameter == "alpha":
-        # ax.set_ylim(0.30, 0.42)
-        pass
+        ax.set_ylim(0.05, 1.3)
     elif fit_parameter == "B":
-        ax.set_ylim(-1000, 5000)
+        ax.set_ylim(-4000, 8000)
     elif fit_parameter == "beta":
         ax.set_ylim(0.10, 0.50)
     for col_idx, systematic_bias_column in enumerate(additive_constant_columns):
@@ -406,11 +413,11 @@ for ax_idx, (ax, fit_parameter) in enumerate(zip(axes, fit_parameters)):
         ax.set_ylim(0.0, 2.50)
     elif fit_parameter == "A":
         ax.set_yscale("log")
-        ax.set_ylim(1e1, 1e4)
+        ax.set_ylim(1e0, 1e4)
     elif fit_parameter == "alpha":
-        ax.set_ylim(0.30, 0.42)
+        ax.set_ylim(0.05, 1.3)
     elif fit_parameter == "B":
-        ax.set_ylim(-1000, 5000)
+        ax.set_ylim(-4000, 8000)
     elif fit_parameter == "beta":
         ax.set_ylim(0.10, 0.50)
 
@@ -533,9 +540,9 @@ for ax_idx, (ax, fit_parameter) in enumerate(zip(axes, fit_parameters)):
         ax.set_ylim(1e-0, 1e10)
     elif fit_parameter == "alpha":
         ax.set_yscale("log")
-        ax.set_ylim(1e-1, 1.3e0)
+        ax.set_ylim(0.05, 1.3)
     elif fit_parameter == "B":
-        ax.set_ylim(-1000, 5000)
+        ax.set_ylim(-4000, 8000)
     elif fit_parameter == "beta":
         ax.set_ylim(0.10, 0.50)
 

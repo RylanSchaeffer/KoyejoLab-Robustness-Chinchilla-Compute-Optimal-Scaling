@@ -13,9 +13,12 @@ plt.rcParams["text.usetex"] = True
 plt.rcParams["font.family"] = "serif"
 plt.rcParams["font.serif"] = "Computer Modern"
 # Can add more commands to this list
-plt.rcParams["text.latex.preamble"] = "\n".join([r"\usepackage{amsmath}"])
+plt.rcParams["text.latex.preamble"] = "\n".join(
+    [r"\usepackage{amsmath}", r"\usepackage[dvipsnames]{xcolor}", r"\usepackage{bm}"]
+)
 # Increase font size.
 plt.rcParams["font.size"] = 23
+plt.rcParams["figure.dpi"] = 150  # Set default DPI to 150
 
 
 def save_plot_with_multiple_extensions(
