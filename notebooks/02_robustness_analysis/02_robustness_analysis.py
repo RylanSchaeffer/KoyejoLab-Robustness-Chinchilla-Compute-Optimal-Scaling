@@ -29,9 +29,163 @@ chinchilla_fits_df, chinchilla_tokens_per_parameter_df = (
         models_parameters_columns=[
             "Correct Eqn. Parameters",
         ],
+        # refresh=True,
     )
 )
 fit_parameters = ["E", "A", "alpha", "B", "beta"]
+
+log_normal_noise_columns = [
+    col
+    for col in chinchilla_fits_df.columns
+    if col.startswith("Correct Eqn. Parameters_Log Normal Noise_")
+]
+log_normal_noise_fits_df = chinchilla_fits_df[log_normal_noise_columns].copy()
+log_normal_noise_fits_df.loc["Sigma"] = [
+    float(col.split("_")[2]) for col in log_normal_noise_columns
+]
+
+
+# Create the colormap for log normal noise perturbations.
+cmap = matplotlib.colormaps.get_cmap("crest")
+log_normal_noise_sigmas = log_normal_noise_fits_df.T["Sigma"].values
+log_normal_noise_sigmas_to_colors_dict = {
+    log_normal_noise_sigma: cmap(i / len(log_normal_noise_sigmas))
+    for i, log_normal_noise_sigma in enumerate(log_normal_noise_sigmas)
+}
+
+
+# Plot the compute-optimal tokens per parameter for log normal noise perturbations.
+plt.close()
+fig = plt.figure(figsize=(12, 6))
+ax = plt.gca()
+training_flop = chinchilla_tokens_per_parameter_df["Training Compute (FLOP)"]
+for log_normal_noise_sigma in sorted(np.unique(log_normal_noise_sigmas)):
+    # Unlike the others, we need to average over the multiple samplings.
+    sigma_columns = [
+        col
+        for col in log_normal_noise_columns
+        if col.startswith(
+            f"Correct Eqn. Parameters_Log Normal Noise_{log_normal_noise_sigma}"
+        )
+    ]
+    print(f"Log Normal Noise (sigma): {log_normal_noise_sigma}")
+    lows = chinchilla_tokens_per_parameter_df[[col + "_Low" for col in sigma_columns]]
+    print(f"{lows.isna().all().mean()} of Lows are NaN")
+    low = np.nanmean(lows.values, axis=1)
+    medians = chinchilla_tokens_per_parameter_df[
+        [col + "_Median" for col in sigma_columns]
+    ]
+    print(f"{medians.isna().all().mean()} of Medians are NaN")
+    median = np.nanmedian(medians.values, axis=1)
+    highs = chinchilla_tokens_per_parameter_df[[col + "_High" for col in sigma_columns]]
+    print(f"{highs.isna().all().mean()} of Highs are NaN")
+    high = np.nanmean(highs.values, axis=1)
+    ax.plot(
+        training_flop,
+        median,
+        label=np.round(log_normal_noise_sigma, 3),
+        color=log_normal_noise_sigmas_to_colors_dict[log_normal_noise_sigma],
+    )
+    ax.fill_between(
+        training_flop,
+        low,
+        high,
+        color=log_normal_noise_sigmas_to_colors_dict[log_normal_noise_sigma],
+        alpha=0.2,
+    )
+ax.set_xlabel("Training Compute (FLOP)")
+ax.set_ylabel("Compute-Optimal\nTokens per Parameter")
+ax.set_title("Log Normal Noise")
+ax.set_xscale("log")
+ax.set_yscale("log")
+# ax.set_ylim(1e-2, 1e4)
+ax.axhline(y=20, color="black", linestyle="--")
+ax.text(
+    x=1e24,
+    y=20,
+    s=r"$D/N = 20$ rule of thumb",
+    color="black",
+    fontsize=20,
+    verticalalignment="bottom",
+)
+ax.legend(title=r"Sigma ($\sigma$)", loc="center left", bbox_to_anchor=(1, 0.5))
+fig.subplots_adjust(right=0.8)
+src.plot.save_plot_with_multiple_extensions(
+    plot_dir=results_dir,
+    plot_filename="compute_optimal_tokens_per_parameter_by_compute_log_normal_noise",
+)
+# plt.show()
+
+# Plot the fit parameters for log normal noise perturbation.
+plt.close()
+fig, axes = plt.subplots(
+    nrows=1,
+    ncols=len(fit_parameters),
+    figsize=(30, 9),
+    sharex=True,
+    sharey=False,
+)
+for ax_idx, (ax, fit_parameter) in enumerate(zip(axes, fit_parameters)):
+    # Set the axes titles.
+    if fit_parameter == "alpha":
+        latex_title = r"$\hat{\alpha}$"
+    elif fit_parameter == "beta":
+        latex_title = r"$\hat{\beta}$"
+    else:
+        latex_title = rf"$\hat{{{fit_parameter}}}$"
+    ax.set_title(latex_title)
+    # # Control the y limits.
+    if fit_parameter == "E":
+        ax.set_ylim(0.0, 2.50)
+        pass
+    elif fit_parameter == "A":
+        # ax.set_ylim(1e1, 1e4)
+        ax.set_yscale("log")
+    elif fit_parameter == "alpha":
+        # ax.set_ylim(0.30, 0.42)
+        pass
+    elif fit_parameter == "B":
+        # ax.set_ylim(-1000, 5000)
+        pass
+    elif fit_parameter == "beta":
+        ax.set_ylim(0.10, 0.50)
+        # pass
+    for col_idx, log_normal_noise_sigma in enumerate(log_normal_noise_sigmas):
+        sigma_columns = [
+            col
+            for col in log_normal_noise_columns
+            if col.startswith(
+                f"Correct Eqn. Parameters_Log Normal Noise_{log_normal_noise_sigma}"
+            )
+        ]
+        # Average over the repeats.
+        ax.errorbar(
+            x=[log_normal_noise_fits_df.loc["Sigma", sigma_columns].mean()],
+            y=[
+                log_normal_noise_fits_df.loc[
+                    fit_parameter + "_fit", sigma_columns
+                ].mean()
+            ],
+            yerr=[
+                1.96
+                * log_normal_noise_fits_df.loc[
+                    fit_parameter + "_se", sigma_columns
+                ].mean()
+            ],
+            color=log_normal_noise_sigmas_to_colors_dict[log_normal_noise_sigma],
+            marker="d",
+            markersize=20,
+            linewidth=2,
+        )
+    ax.set_xscale(
+        "symlog",
+        linthresh=log_normal_noise_sigmas[log_normal_noise_sigmas > 0].min() / 2.0,
+    )
+    ax.set_xlabel(r"Sigma ($\sigma$)")
+src.plot.save_plot_with_multiple_extensions(
+    plot_dir=results_dir, plot_filename="fit_parameters_log_normal_noise"
+)
+plt.show()
 
 
 # Extract the Additive Constant parameter fits.
@@ -46,7 +200,7 @@ additive_constant_fits_df.loc["Constant"] = [
 ]
 
 
-# Create the colormap for multiplicative constant perturbations.
+# Create the colormap for additive constant perturbations.
 cmap = matplotlib.colormaps.get_cmap("flare")
 additive_constants = additive_constant_fits_df.T["Constant"].values
 additive_constants_to_colors_dict = {
@@ -120,7 +274,7 @@ for ax_idx, (ax, fit_parameter) in enumerate(zip(axes, fit_parameters)):
     ax.set_title(latex_title)
     # # Control the y limits.
     if fit_parameter == "E":
-        # ax.set_ylim(1.74, 1.86)
+        ax.set_ylim(0.0, 2.50)
         pass
     elif fit_parameter == "A":
         # ax.set_ylim(1e1, 1e4)
@@ -131,7 +285,7 @@ for ax_idx, (ax, fit_parameter) in enumerate(zip(axes, fit_parameters)):
     elif fit_parameter == "B":
         ax.set_ylim(-1000, 5000)
     elif fit_parameter == "beta":
-        ax.set_ylim(0.30, 0.42)
+        ax.set_ylim(0.10, 0.50)
     for col_idx, systematic_bias_column in enumerate(additive_constant_columns):
         ax.errorbar(
             x=[additive_constant_fits_df.loc["Constant", systematic_bias_column]],
@@ -249,7 +403,7 @@ for ax_idx, (ax, fit_parameter) in enumerate(zip(axes, fit_parameters)):
 
     # Control the y limits.
     if fit_parameter == "E":
-        ax.set_ylim(1.74, 1.86)
+        ax.set_ylim(0.0, 2.50)
     elif fit_parameter == "A":
         ax.set_yscale("log")
         ax.set_ylim(1e1, 1e4)
@@ -258,7 +412,7 @@ for ax_idx, (ax, fit_parameter) in enumerate(zip(axes, fit_parameters)):
     elif fit_parameter == "B":
         ax.set_ylim(-1000, 5000)
     elif fit_parameter == "beta":
-        ax.set_ylim(0.30, 0.42)
+        ax.set_ylim(0.10, 0.50)
 
     for col_idx, systematic_bias_column in enumerate(multiplicative_constant_columns):
         ax.errorbar(
@@ -350,7 +504,7 @@ src.plot.save_plot_with_multiple_extensions(
     plot_dir=results_dir,
     plot_filename="compute_optimal_tokens_per_parameter_by_compute_systematic_bias",
 )
-plt.show()
+# plt.show()
 
 # Plot the fit parameters for systematic bias perturbation.
 plt.close()
@@ -373,7 +527,7 @@ for ax_idx, (ax, fit_parameter) in enumerate(zip(axes, fit_parameters)):
 
     # Control the y limits.
     if fit_parameter == "E":
-        ax.set_ylim(1.74, 1.86)
+        ax.set_ylim(0.0, 2.5)
     elif fit_parameter == "A":
         ax.set_yscale("log")
         ax.set_ylim(1e-0, 1e10)
@@ -383,7 +537,7 @@ for ax_idx, (ax, fit_parameter) in enumerate(zip(axes, fit_parameters)):
     elif fit_parameter == "B":
         ax.set_ylim(-1000, 5000)
     elif fit_parameter == "beta":
-        ax.set_ylim(0.30, 0.42)
+        ax.set_ylim(0.10, 0.50)
 
     for col_idx, systematic_bias_column in enumerate(systematic_bias_columns):
         ax.errorbar(
@@ -408,11 +562,11 @@ for ax_idx, (ax, fit_parameter) in enumerate(zip(axes, fit_parameters)):
         )
 
     ax.set_xscale("log")
-    ax.set_xlabel(r"Score ($s$)")
+    ax.set_xlabel(r"Slope ($s$)")
     ax.set_xlim(1 / 4.0, 4.0)
 src.plot.save_plot_with_multiple_extensions(
     plot_dir=results_dir, plot_filename="fit_parameters_systematic_bias"
 )
-plt.show()
+# plt.show()
 
 print("Finished 02_robustness_analysis!")

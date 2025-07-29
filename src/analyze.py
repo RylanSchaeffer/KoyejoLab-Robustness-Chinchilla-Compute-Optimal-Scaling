@@ -66,11 +66,13 @@ def compute_chinchilla_fit_dataframes(
         (indices, init_params, parameters, tokens, losses) for indices in random_indices
     ]
 
+    # Parallel implementation.
     with multiprocessing.Pool() as pool:
         # map() distributes the 'task_args' across the worker processes
         # and collects the results in a list.
         param_list = pool.map(compute_chinchilla_fit_bootstrap_iteration, task_args)
 
+    ##  Sequential implementation.
     # for num, indices in enumerate(random_indices):
     #     best_loss = np.inf
     #     best_params = None
@@ -331,13 +333,13 @@ def compute_or_load_chinchilla_robustness_fit_dataframes(
             for slope in np.logspace(-0.5, 0.5, 11)
         }
         | {
-            f"Log Normal Noise_{sigma}": partial(
+            f"Log Normal Noise_{sigma}_{repeat_idx}": partial(
                 parameter_transformation_log_normal_noise,
                 sigma=sigma,
                 repeat_idx=repeat_idx,
             )
-            for sigma in np.logspace(-2, 2, num=11)
-            for repeat_idx in np.arange(1)
+            for sigma in ([0.0] + np.logspace(-0.5, 0.5, num=10).tolist())
+            for repeat_idx in np.arange(17)
         }
         | {
             f"Multiplicative Constant_{c}": partial(
