@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 from scipy.optimize import OptimizeWarning
+from scipy.stats import linregress
 import seaborn as sns
 import warnings
 
@@ -85,6 +86,7 @@ fig, axes = plt.subplots(
     sharex=True,
     sharey=False,
 )
+axes[0].set_ylabel("Value")
 for ax_idx, (ax, fit_parameter) in enumerate(zip(axes, fit_parameters)):
     # Set the axes titles.
     if fit_parameter == "alpha":
@@ -134,7 +136,7 @@ for ax_idx, (ax, fit_parameter) in enumerate(zip(axes, fit_parameters)):
 src.plot.save_plot_with_multiple_extensions(
     plot_dir=results_dir, plot_filename="fit_parameters"
 )
-plt.show()
+# plt.show()
 
 
 plt.close()
@@ -153,11 +155,22 @@ for ax_idx, (ax, models_parameters_column) in enumerate(
     median = chinchilla_tokens_per_parameter_df[models_parameters_column + " Median"]
     high = chinchilla_tokens_per_parameter_df[models_parameters_column + " High"]
 
+    slope, intercept, r, p, se = linregress(np.log10(training_flop), median)
+
+    print("Model parameters:", models_parameters_column)
+    print("Slope:", slope)
+    print("Intercept:", intercept)
+    print("R:", r)
+    print("P:", p)
+    print("SE:", se)
+    print("\n\n\n")
+
     ax.plot(
         training_flop,
         median,
-        label=models_parameters_column,
+        # label=models_parameters_column,
         color=models_parameters_columns_colors[models_parameters_column],
+        # label=f"{slope:.3e}",
     )
     ax.fill_between(
         training_flop,
@@ -182,10 +195,10 @@ for ax_idx, (ax, models_parameters_column) in enumerate(
         fontsize=20,
         verticalalignment="bottom",
     )
-
+    # ax.legend()
 src.plot.save_plot_with_multiple_extensions(
     plot_dir=results_dir,
     plot_filename="compute_optimal_tokens_per_parameter_by_compute",
 )
-# plt.show()
+plt.show()
 print("Finished 01_epoch_research_fitting!")

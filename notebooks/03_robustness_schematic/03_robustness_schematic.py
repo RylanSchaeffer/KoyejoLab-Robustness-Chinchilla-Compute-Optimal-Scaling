@@ -53,10 +53,10 @@ for sigma in sigmas:
 # )
 plt.legend(title=r"Noise ($\sigma$)", loc="center left", bbox_to_anchor=(1, 0.5))
 plt.xscale("log")
-plt.xlabel("True Model Parameters")
+plt.xlabel(r"True Model Parameters ($N_i$)")
 plt.yscale("log")
-plt.ylabel("Perturbed Model Parameters")
-plt.title("Log Normal Noise")
+plt.ylabel(r"Perturbed Model Parameters ($\Tilde{N}_i$)")
+plt.title(r"Log Normal Noise: $\Tilde{N}_i := \exp(\delta_i) \cdot N_i$")
 fig.subplots_adjust(right=0.8)
 src.plot.save_plot_with_multiple_extensions(
     plot_dir=results_dir,
@@ -95,10 +95,10 @@ for additive_constant in additive_constants:
 # )
 plt.legend(title=r"Constant ($c$)", loc="center left", bbox_to_anchor=(1, 0.5))
 plt.xscale("log")
-plt.xlabel("True Model Parameters")
+plt.xlabel(r"True Model Parameters ($N_i$)")
 plt.yscale("log")
-plt.ylabel("Perturbed Model Parameters")
-plt.title("Additive Constant")
+plt.ylabel(r"Perturbed Model Parameters ($\Tilde{N}_i$)")
+plt.title("Additive Constant Perturbation: $\Tilde{N}_i := c_a + N_i$")
 fig.subplots_adjust(right=0.8)
 src.plot.save_plot_with_multiple_extensions(
     plot_dir=results_dir,
@@ -133,10 +133,10 @@ for multiplicative_constant in multiplicative_constants:
 # )
 plt.legend(title=r"Constant ($c$)", loc="center left", bbox_to_anchor=(1, 0.5))
 plt.xscale("log")
-plt.xlabel("True Model Parameters")
+plt.xlabel(r"True Model Parameters ($N_i$)")
 plt.yscale("log")
-plt.ylabel("Perturbed Model Parameters")
-plt.title("Multiplicative Constant")
+plt.ylabel(r"Perturbed Model Parameters ($\Tilde{N}_i$)")
+plt.title(r"Multiplicative Constant Perturbation: $\Tilde{N}_i := c_m \cdot N_i$")
 fig.subplots_adjust(right=0.8)
 src.plot.save_plot_with_multiple_extensions(
     plot_dir=results_dir,
@@ -162,10 +162,12 @@ for slope in slopes:
     )
 plt.legend(title=r"Slope ($s$)", loc="center left", bbox_to_anchor=(1, 0.5))
 plt.xscale("log")
-plt.xlabel("True Model Parameters")
+plt.xlabel(r"True Model Parameters ($N_i$)")
 plt.yscale("log")
-plt.ylabel("Perturbed Model Parameters")
-plt.title("Systematic Bias")
+plt.ylabel(r"Perturbed Model Parameters ($\Tilde{N}_i$)")
+plt.title(
+    "Systematic Bias Perturbation: $\Tilde{N}_i := \mu_{\mathrm{geo}} \cdot (N_i / \mu_{\mathrm{geo}})$"
+)
 fig.subplots_adjust(right=0.8)
 src.plot.save_plot_with_multiple_extensions(
     plot_dir=results_dir,

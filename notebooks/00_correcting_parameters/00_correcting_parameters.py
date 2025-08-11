@@ -63,6 +63,13 @@ print(
     f"Best Fit Formula reduces {fraction_relative_error_zero_under_incorrect_eqn} to 0% relative error."
 )
 
+for equation, subset_df in chinchilla_parameters_relative_error_tall_df.groupby(
+    ["Equation"]
+):
+    print("Equation: ", equation[0])
+    print(subset_df["Relative Error (\%)"].describe())
+    print("\n\n")
+
 models_parameters_columns_colors = {
     "Reported": plt.cm.viridis(0.0 / 3.0),
     "Best Fit Formula": plt.cm.viridis(1.0 / 3.0),

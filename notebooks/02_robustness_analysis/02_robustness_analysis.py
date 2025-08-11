@@ -3,7 +3,8 @@ import matplotlib.colors
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-from scipy.optimize import OptimizeWarning
+from scipy.optimize import OptimizeWarning, curve_fit
+from scipy.stats import linregress
 import seaborn as sns
 import warnings
 
@@ -125,6 +126,7 @@ fig, axes = plt.subplots(
     sharex=True,
     sharey=False,
 )
+axes[0].set_ylabel("Value")
 sorted_unique_log_normal_noise_sigmas = sorted(np.unique(log_normal_noise_sigmas))
 for ax_idx, (ax, fit_parameter) in enumerate(zip(axes, fit_parameters)):
     # Set the axes titles.
@@ -271,6 +273,7 @@ fig, axes = plt.subplots(
     sharex=True,
     sharey=False,
 )
+axes[0].set_ylabel("Value")
 for ax_idx, (ax, fit_parameter) in enumerate(zip(axes, fit_parameters)):
     # Set the axes titles.
     if fit_parameter == "alpha":
@@ -293,22 +296,22 @@ for ax_idx, (ax, fit_parameter) in enumerate(zip(axes, fit_parameters)):
         ax.set_ylim(-4000, 8000)
     elif fit_parameter == "beta":
         ax.set_ylim(0.10, 0.50)
-    for col_idx, systematic_bias_column in enumerate(additive_constant_columns):
+    for col_idx, additive_constant_column in enumerate(additive_constant_columns):
         ax.errorbar(
-            x=[additive_constant_fits_df.loc["Constant", systematic_bias_column]],
+            x=[additive_constant_fits_df.loc["Constant", additive_constant_column]],
             y=[
                 additive_constant_fits_df.loc[
-                    fit_parameter + "_fit", systematic_bias_column
+                    fit_parameter + "_fit", additive_constant_column
                 ]
             ],
             yerr=[
                 1.96
                 * additive_constant_fits_df.loc[
-                    fit_parameter + "_se", systematic_bias_column
+                    fit_parameter + "_se", additive_constant_column
                 ]
             ],
             color=additive_constants_to_colors_dict[
-                additive_constant_fits_df.loc["Constant", systematic_bias_column]
+                additive_constant_fits_df.loc["Constant", additive_constant_column]
             ],
             marker="d",
             markersize=20,
@@ -398,6 +401,7 @@ fig, axes = plt.subplots(
     sharex=True,
     sharey=False,
 )
+axes[0].set_ylabel("Value")
 for ax_idx, (ax, fit_parameter) in enumerate(zip(axes, fit_parameters)):
     # Set the axes titles.
     if fit_parameter == "alpha":
@@ -421,22 +425,28 @@ for ax_idx, (ax, fit_parameter) in enumerate(zip(axes, fit_parameters)):
     elif fit_parameter == "beta":
         ax.set_ylim(0.10, 0.50)
 
-    for col_idx, systematic_bias_column in enumerate(multiplicative_constant_columns):
+    for col_idx, additive_constant_column in enumerate(multiplicative_constant_columns):
         ax.errorbar(
-            x=[multiplicative_constant_fits_df.loc["Constant", systematic_bias_column]],
+            x=[
+                multiplicative_constant_fits_df.loc[
+                    "Constant", additive_constant_column
+                ]
+            ],
             y=[
                 multiplicative_constant_fits_df.loc[
-                    fit_parameter + "_fit", systematic_bias_column
+                    fit_parameter + "_fit", additive_constant_column
                 ]
             ],
             yerr=[
                 1.96
                 * multiplicative_constant_fits_df.loc[
-                    fit_parameter + "_se", systematic_bias_column
+                    fit_parameter + "_se", additive_constant_column
                 ]
             ],
             color=multiplicative_constants_to_colors_dict[
-                multiplicative_constant_fits_df.loc["Constant", systematic_bias_column]
+                multiplicative_constant_fits_df.loc[
+                    "Constant", additive_constant_column
+                ]
             ],
             marker="d",
             markersize=20,
@@ -472,11 +482,11 @@ plt.close()
 fig = plt.figure(figsize=(12, 6))
 ax = plt.gca()
 training_flop = chinchilla_tokens_per_parameter_df["Training Compute (FLOP)"]
-for systematic_bias_column in systematic_bias_columns:
-    low = chinchilla_tokens_per_parameter_df[systematic_bias_column + "_Low"]
-    median = chinchilla_tokens_per_parameter_df[systematic_bias_column + "_Median"]
-    high = chinchilla_tokens_per_parameter_df[systematic_bias_column + "_High"]
-    slope = float(systematic_bias_column.split("_")[2])
+for additive_constant_column in systematic_bias_columns:
+    low = chinchilla_tokens_per_parameter_df[additive_constant_column + "_Low"]
+    median = chinchilla_tokens_per_parameter_df[additive_constant_column + "_Median"]
+    high = chinchilla_tokens_per_parameter_df[additive_constant_column + "_High"]
+    slope = float(additive_constant_column.split("_")[2])
     ax.plot(
         training_flop,
         median,
@@ -513,6 +523,38 @@ src.plot.save_plot_with_multiple_extensions(
 )
 # plt.show()
 
+
+# Check that alpha_fit decays as a power law with s.
+plt.close()
+x = [
+    systematic_bias_fits_df.loc["Slope", systematic_bias_column]
+    for systematic_bias_column in systematic_bias_columns
+]
+y = [
+    systematic_bias_fits_df.loc["alpha_fit", systematic_bias_column]
+    for systematic_bias_column in systematic_bias_columns
+]
+slope, intercept, r, p, se = linregress(np.log10(x), np.log10(y))
+print(
+    f"alpha\nSlope: {slope:.3e}\nIntercept: {intercept:.3e}\np-value: {p:.3e}\nR^2: {r**2:.3e}"
+)
+plt.plot(x, y)
+plt.xscale("log")
+plt.yscale("log")
+plt.show()
+
+# # Check that A_fit decays as a TODO with s.
+# y = [
+#     systematic_bias_fits_df.loc["A_fit", systematic_bias_column]
+#     for systematic_bias_column in systematic_bias_columns
+# ]
+# plt.close()
+# plt.plot(x, y)
+# plt.plot(x, y_hat)
+# plt.xscale("log")
+# plt.yscale("log")
+# plt.show()
+
 # Plot the fit parameters for systematic bias perturbation.
 plt.close()
 fig, axes = plt.subplots(
@@ -522,6 +564,7 @@ fig, axes = plt.subplots(
     sharex=True,
     sharey=False,
 )
+axes[0].set_ylabel("Value")
 for ax_idx, (ax, fit_parameter) in enumerate(zip(axes, fit_parameters)):
     # Set the axes titles.
     if fit_parameter == "alpha":
