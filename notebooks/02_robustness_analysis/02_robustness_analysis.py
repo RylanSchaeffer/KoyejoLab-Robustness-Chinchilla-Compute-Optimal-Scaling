@@ -1,16 +1,14 @@
+import os
+import warnings
+
 import matplotlib.cm
 import matplotlib.colors
 import matplotlib.pyplot as plt
 import numpy as np
-import os
+import seaborn as sns
+from rechinchilla import analyze, plot
 from scipy.optimize import OptimizeWarning, curve_fit
 from scipy.stats import linregress
-import seaborn as sns
-import warnings
-
-
-import src.analyze
-import src.plot
 
 np.seterr(over="ignore")
 np.seterr(invalid="ignore")
@@ -19,13 +17,13 @@ warnings.filterwarnings("ignore", category=OptimizeWarning)
 refresh = False
 # refresh = True
 
-data_dir, results_dir = src.analyze.setup_notebook_dir(
+data_dir, results_dir = analyze.setup_notebook_dir(
     notebook_dir=os.path.dirname(os.path.abspath(__file__)),
     refresh=False,
 )
 
 chinchilla_fits_df, chinchilla_tokens_per_parameter_df = (
-    src.analyze.compute_or_load_chinchilla_robustness_fit_dataframes(
+    analyze.compute_or_load_chinchilla_robustness_fit_dataframes(
         data_dir=data_dir,
         models_parameters_columns=[
             "Correct Eqn. Parameters",
@@ -111,7 +109,7 @@ ax.text(
 )
 ax.legend(title=r"Sigma ($\sigma$)", loc="center left", bbox_to_anchor=(1, 0.5))
 fig.subplots_adjust(right=0.8)
-src.plot.save_plot_with_multiple_extensions(
+plot.save_plot_with_multiple_extensions(
     plot_dir=results_dir,
     plot_filename="compute_optimal_tokens_per_parameter_by_compute_log_normal_noise",
 )
@@ -192,7 +190,7 @@ for ax_idx, (ax, fit_parameter) in enumerate(zip(axes, fit_parameters)):
         ),
     )
     ax.set_xlabel(r"Sigma ($\sigma$)")
-src.plot.save_plot_with_multiple_extensions(
+plot.save_plot_with_multiple_extensions(
     plot_dir=results_dir, plot_filename="fit_parameters_log_normal_noise"
 )
 # plt.show()
@@ -231,7 +229,7 @@ for models_parameters_column in additive_constant_columns:
     ax.plot(
         training_flop,
         median,
-        label=src.analyze.sci_notation_trimmed(additive_constant),
+        label=analyze.sci_notation_trimmed(additive_constant),
         color=additive_constants_to_colors_dict[additive_constant],
     )
     ax.fill_between(
@@ -258,7 +256,7 @@ ax.text(
 )
 ax.legend(title=r"Constant ($c$)", loc="center left", bbox_to_anchor=(1, 0.5))
 fig.subplots_adjust(right=0.8)
-src.plot.save_plot_with_multiple_extensions(
+plot.save_plot_with_multiple_extensions(
     plot_dir=results_dir,
     plot_filename="compute_optimal_tokens_per_parameter_by_compute_additive_constant",
 )
@@ -318,7 +316,7 @@ for ax_idx, (ax, fit_parameter) in enumerate(zip(axes, fit_parameters)):
             linewidth=2,
         )
     ax.set_xlabel(r"Constant ($c$)")
-src.plot.save_plot_with_multiple_extensions(
+plot.save_plot_with_multiple_extensions(
     plot_dir=results_dir, plot_filename="fit_parameters_additive_constant"
 )
 # plt.show()
@@ -386,7 +384,7 @@ ax.text(
 )
 ax.legend(title=r"Constant ($c$)", loc="center left", bbox_to_anchor=(1, 0.5))
 fig.subplots_adjust(right=0.8)
-src.plot.save_plot_with_multiple_extensions(
+plot.save_plot_with_multiple_extensions(
     plot_dir=results_dir,
     plot_filename="compute_optimal_tokens_per_parameter_by_compute_multiplicative_constant",
 )
@@ -456,7 +454,7 @@ for ax_idx, (ax, fit_parameter) in enumerate(zip(axes, fit_parameters)):
     ax.set_xscale("log")
     ax.set_xlabel(r"Constant ($c$)")
     ax.set_xlim(1.0 / 3e3, 3e3)
-src.plot.save_plot_with_multiple_extensions(
+plot.save_plot_with_multiple_extensions(
     plot_dir=results_dir, plot_filename="fit_parameters_multiplicative_constant"
 )
 # plt.show()
@@ -517,7 +515,7 @@ ax.text(
 )
 ax.legend(title=r"Slope ($s$)", loc="center left", bbox_to_anchor=(1, 0.5))
 fig.subplots_adjust(right=0.8)
-src.plot.save_plot_with_multiple_extensions(
+plot.save_plot_with_multiple_extensions(
     plot_dir=results_dir,
     plot_filename="compute_optimal_tokens_per_parameter_by_compute_systematic_bias",
 )
@@ -614,7 +612,7 @@ for ax_idx, (ax, fit_parameter) in enumerate(zip(axes, fit_parameters)):
     ax.set_xscale("log")
     ax.set_xlabel(r"Slope ($s$)")
     ax.set_xlim(1 / 4.0, 4.0)
-src.plot.save_plot_with_multiple_extensions(
+plot.save_plot_with_multiple_extensions(
     plot_dir=results_dir, plot_filename="fit_parameters_systematic_bias"
 )
 # plt.show()
