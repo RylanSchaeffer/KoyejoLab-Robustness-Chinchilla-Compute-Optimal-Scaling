@@ -1,14 +1,15 @@
-from autograd import grad
-from functools import partial
 import multiprocessing
-import numpy as np
 import os
-import pandas as pd
-from scipy.optimize import minimize
-from scipy.stats import multivariate_normal
+from functools import partial
 from typing import List, Tuple
 
-import src.epoch_research_chinchilla_fit
+import numpy as np
+import pandas as pd
+from autograd import grad
+from scipy.optimize import minimize
+from scipy.stats import multivariate_normal
+
+from rechinchilla import epoch_research_chinchilla_fit as cfit
 
 
 def compute_chinchilla_fit_bootstrap_iteration(args):
@@ -20,10 +21,10 @@ def compute_chinchilla_fit_bootstrap_iteration(args):
     indices, init_params, all_parameters, all_tokens, all_losses = args
 
     result = minimize(
-        src.epoch_research_chinchilla_fit.huber_loss_objective,
+        cfit.huber_loss_objective,
         np.array(init_params),
         args=(all_parameters[indices], all_tokens[indices], all_losses[indices]),
-        jac=grad(src.epoch_research_chinchilla_fit.huber_loss_objective),
+        jac=grad(cfit.huber_loss_objective),
         method="BFGS",
         options={"maxiter": 10000},
     )
@@ -36,7 +37,6 @@ def compute_chinchilla_fit_dataframes(
     losses: np.ndarray,
     bootstraps: int = 4000,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
-
     parameter_labels = ["A", "B", "E", "alpha", "beta"]
     nr_of_models_excluded = 5
     true_params = np.array([6.0073404, 6.0179186, 0.5267228, 0.33917084, 0.2849083])
@@ -78,10 +78,10 @@ def compute_chinchilla_fit_dataframes(
     #     best_params = None
     #
     #     result = minimize(
-    #         src.epoch_research_chinchilla_fit.huber_loss_objective,
+    #         cfit.huber_loss_objective,
     #         np.array(init_params),
     #         args=(parameters[indices], tokens[indices], losses[indices]),
-    #         jac=grad(src.epoch_research_chinchilla_fit.huber_loss_objective),
+    #         jac=grad(cfit.huber_loss_objective),
     #         method="BFGS",
     #     )
     #
@@ -97,9 +97,7 @@ def compute_chinchilla_fit_dataframes(
 
     param_array = np.array(param_list)
     cov_matrix = np.cov(np.transpose(param_array))
-    param_list_untransformed = src.epoch_research_chinchilla_fit.untransform_params(
-        param_array
-    )
+    param_list_untransformed = cfit.untransform_params(param_array)
     cov_matrix_untransformed = np.cov(np.transpose(param_list_untransformed))
     standard_errors_untransformed = np.sqrt(np.diag(cov_matrix_untransformed[:5, :5]))
 
@@ -114,18 +112,16 @@ def compute_chinchilla_fit_dataframes(
         ]
     )
     result = minimize(
-        src.epoch_research_chinchilla_fit.objective,
+        cfit.objective,
         np.array(init_params + [0]),
         args=(parameters[indices], tokens[indices], losses[indices]),
         method="BFGS",
-        jac=grad(src.epoch_research_chinchilla_fit.objective),
+        jac=grad(cfit.objective),
     )
 
     # Print the parameters.
     estimated_params = result.x[:5]
-    estimated_params_untransformed = (
-        src.epoch_research_chinchilla_fit.untransform_params(estimated_params)
-    )
+    estimated_params_untransformed = cfit.untransform_params(estimated_params)
     # print(estimated_params_untransformed)
     for index, label in enumerate(parameter_labels):
         print(
@@ -164,28 +160,20 @@ def compute_chinchilla_fit_dataframes(
         a_high = 0.455
         a_mid = np.mean([a_low, a_high])
 
-        N_true_opt, D_true_opt = (
-            src.epoch_research_chinchilla_fit.compute_optimal_allocation_from_shares(
-                threshold, src.epoch_research_chinchilla_fit.G(true_params), a_mid
-            )
+        N_true_opt, D_true_opt = cfit.compute_optimal_allocation_from_shares(
+            threshold, cfit.G(true_params), a_mid
         )
         D_N_true_ratio = D_true_opt / N_true_opt
 
         for simulated_params in simulated_params_list:
-            N_opt, D_opt = src.epoch_research_chinchilla_fit.compute_optimal_allocation(
-                threshold, simulated_params
-            )
+            N_opt, D_opt = cfit.compute_optimal_allocation(threshold, simulated_params)
             D_N_ratio.append(D_opt / N_opt)
 
-            loss_achieved_by_chinchilla = (
-                src.epoch_research_chinchilla_fit.scaling_law_reducible(
-                    N_true_opt, D_true_opt, simulated_params
-                )
+            loss_achieved_by_chinchilla = cfit.scaling_law_reducible(
+                N_true_opt, D_true_opt, simulated_params
             )
-            compute_needed_for_loss = (
-                src.epoch_research_chinchilla_fit.optimal_compute_from_reducible_loss(
-                    loss_achieved_by_chinchilla, simulated_params
-                )
+            compute_needed_for_loss = cfit.optimal_compute_from_reducible_loss(
+                loss_achieved_by_chinchilla, simulated_params
             )
 
             compute_loss_factor.append(threshold / compute_needed_for_loss)
@@ -215,7 +203,6 @@ def compute_or_load_chinchilla_fit_dataframes(
     refresh: bool = False,
     bootstraps: int = 4000,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
-
     chinchilla_fits_df_path = os.path.join(data_dir, "chinchilla_fits.csv")
     chinchilla_tokens_per_parameter_df_path = os.path.join(
         data_dir, "chinchilla_tokens_per_parameter.csv"
@@ -290,7 +277,6 @@ def compute_or_load_chinchilla_robustness_fit_dataframes(
     refresh: bool = False,
     bootstraps: int = 4000,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
-
     chinchilla_fits_df_path = os.path.join(data_dir, "chinchilla_robustness_fits.csv")
     chinchilla_tokens_per_parameter_df_path = os.path.join(
         data_dir, "chinchilla_robustness_tokens_per_parameter.csv"

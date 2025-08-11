@@ -1,0 +1,17 @@
+[project]
+name = "rechinchilla"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "autograd>=1.8.0",
+    "matplotlib>=3.10.5",
+    "pandas>=2.3.1",
+    "scipy>=1.16.1",
+    "seaborn>=0.13.2",
+]
+
+[build-system]
+requires = ["setuptools>=42"]
+build-backend = "setuptools.build_meta"

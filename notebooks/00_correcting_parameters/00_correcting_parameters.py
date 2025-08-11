@@ -1,24 +1,20 @@
-import matplotlib.pyplot as plt
-import numpy as np
-import seaborn as sns
 import os
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-
-import src.analyze
-import src.plot
-
+import seaborn as sns
+from rechinchilla import analyze, plot
 
 refresh = False
 # refresh = True
 
-data_dir, results_dir = src.analyze.setup_notebook_dir(
+data_dir, results_dir = analyze.setup_notebook_dir(
     notebook_dir=os.path.dirname(os.path.abspath(__file__)),
     refresh=False,
 )
 
-chinchilla_parameters_df = src.analyze.load_chinchilla_model_parameters_csv()
+chinchilla_parameters_df = analyze.load_chinchilla_model_parameters_csv()
 
 chinchilla_parameters_relative_error_tall_df = chinchilla_parameters_df[
     [
@@ -32,14 +28,14 @@ chinchilla_parameters_relative_error_tall_df = chinchilla_parameters_df[
     var_name="Equation",
     value_name="Relative Error (\%)",
 )
-chinchilla_parameters_relative_error_tall_df[
-    "Equation"
-] = chinchilla_parameters_relative_error_tall_df["Equation"].map(
-    {
-        "Relative Error Reported Parameters": "Reported",
-        "Relative Error Correct Eqn.": "Correct Formula",
-        "Relative Error Incorrect Eqn.": "Best Fit Formula",
-    }
+chinchilla_parameters_relative_error_tall_df["Equation"] = (
+    chinchilla_parameters_relative_error_tall_df["Equation"].map(
+        {
+            "Relative Error Reported Parameters": "Reported",
+            "Relative Error Correct Eqn.": "Correct Formula",
+            "Relative Error Incorrect Eqn.": "Best Fit Formula",
+        }
+    )
 )
 chinchilla_parameters_relative_error_tall_df["Relative Error Is Zero"] = (
     chinchilla_parameters_relative_error_tall_df["Relative Error (\%)"] == 0
@@ -138,7 +134,7 @@ ax.text(
     verticalalignment="bottom",
     horizontalalignment="left",
 )
-src.plot.save_plot_with_multiple_extensions(
+plot.save_plot_with_multiple_extensions(
     plot_dir=results_dir,
     plot_filename="y=relative_error_x=reported_parameters_hue=equation",
 )
@@ -173,7 +169,7 @@ plt.show()
 #     yscale="log",
 # )
 # sns.move_legend(g, "upper left", bbox_to_anchor=(1, 1))
-# src.plot.save_plot_with_multiple_extensions(
+# plot.save_plot_with_multiple_extensions(
 #     plot_dir=results_dir,
 #     plot_filename="y=calculated_parameters_x=reported_parameters_hue=equation",
 # )

@@ -1,3 +1,6 @@
 .idea
+.direnv/
+.envrc
 wandb
 **/__pycache__
+*.egg-info/

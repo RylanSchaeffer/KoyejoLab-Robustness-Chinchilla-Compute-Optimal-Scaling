@@ -1,14 +1,12 @@
-import matplotlib.pyplot as plt
-import numpy as np
 import os
-from scipy.optimize import OptimizeWarning
-from scipy.stats import linregress
-import seaborn as sns
 import warnings
 
-
-import src.analyze
-import src.plot
+import matplotlib.pyplot as plt
+import numpy as np
+import seaborn as sns
+from rechinchilla import analyze, plot
+from scipy.optimize import OptimizeWarning
+from scipy.stats import linregress
 
 np.seterr(over="ignore")
 np.seterr(invalid="ignore")
@@ -17,13 +15,13 @@ warnings.filterwarnings("ignore", category=OptimizeWarning)
 refresh = False
 # refresh = True
 
-data_dir, results_dir = src.analyze.setup_notebook_dir(
+data_dir, results_dir = analyze.setup_notebook_dir(
     notebook_dir=os.path.dirname(os.path.abspath(__file__)),
     refresh=False,
 )
 
 chinchilla_fits_df, chinchilla_tokens_per_parameter_df = (
-    src.analyze.compute_or_load_chinchilla_fit_dataframes(
+    analyze.compute_or_load_chinchilla_fit_dataframes(
         data_dir=data_dir,
         models_parameters_columns=[
             "Model Size",
@@ -133,7 +131,7 @@ for ax_idx, (ax, fit_parameter) in enumerate(zip(axes, fit_parameters)):
         rotation=45,
         ha="right",
     )  # Set the labels and rotate them
-src.plot.save_plot_with_multiple_extensions(
+plot.save_plot_with_multiple_extensions(
     plot_dir=results_dir, plot_filename="fit_parameters"
 )
 # plt.show()
@@ -196,7 +194,7 @@ for ax_idx, (ax, models_parameters_column) in enumerate(
         verticalalignment="bottom",
     )
     # ax.legend()
-src.plot.save_plot_with_multiple_extensions(
+plot.save_plot_with_multiple_extensions(
     plot_dir=results_dir,
     plot_filename="compute_optimal_tokens_per_parameter_by_compute",
 )
