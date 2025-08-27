@@ -22,13 +22,13 @@
 
 ## Running
 
-[00_correcting_parameters.py](notebooks/00_correcting_parameters/00_correcting_parameters.py) produces the relative error of reported parameters vs the "correct" equation and vs the "incorrect" equation:
+[00_correcting_parameters.py](notebooks/00_assessing_parameters/00_correcting_parameters.py) produces the relative error of reported parameters vs the "correct" equation and vs the "incorrect" equation:
 
-![y=relative_error_x=reported_parameters_hue=equation.png](notebooks/00_correcting_parameters/results/y%3Drelative_error_x%3Dreported_parameters_hue%3Dequation.png)
+![y=relative_error_x=reported_parameters_hue=equation.png](notebooks/00_assessing_parameters/results/y%3Drelative_error_x%3Dreported_parameters_hue%3Dequation.png)
 
 [01_epoch_research_fitting.py](notebooks/01_epoch_research_fitting/01_epoch_research_fitting.py) produces the compute-optimal tokens-per-parameter and the estimated neural scaling law parameters:
 
-![compute_optimal_tokens_per_parameter_by_models_parameters.png](notebooks/01_epoch_research_fitting/results/compute_optimal_tokens_per_parameter_by_models_parameters.png)
+![compute_optimal_tokens_per_parameter_by_models_parameters.png](notebooks/01_epoch_research_fitting/results/compute_optimal_tokens_per_parameter_by_compute.png)
 
 ![fit_parameters.png](notebooks/01_epoch_research_fitting/results/fit_parameters.png)
 
@@ -52,4 +52,4 @@ To cite this work, please use:
 ## Contacting
 
 Questions? Comments? Interested in collaborating?
-Open an issue or email rschaef@cs.stanford.edu or any of the other authors.
+Open an issue or email rschaef@cs.stanford.edu and/or any of the other authors.

@@ -21,7 +21,7 @@ data_dir, results_dir = src.analyze.setup_notebook_dir(
 
 chinchilla_parameters_df = src.analyze.load_chinchilla_model_parameters_csv()
 
-correct_eqn_parameters = chinchilla_parameters_df["Correct Eqn. Parameters"].values
+correct_eqn_parameters = chinchilla_parameters_df["Standard Formula Parameters"].values
 min_lim_val = correct_eqn_parameters.min()
 max_lim_val = correct_eqn_parameters.max()
 

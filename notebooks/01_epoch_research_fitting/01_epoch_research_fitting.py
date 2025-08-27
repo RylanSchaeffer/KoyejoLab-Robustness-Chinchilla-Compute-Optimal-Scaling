@@ -28,8 +28,8 @@ chinchilla_fits_df, chinchilla_tokens_per_parameter_df = (
         models_parameters_columns=[
             "Model Size",
             "Reported Parameters",
-            "Incorrect Eqn. Parameters",
-            "Correct Eqn. Parameters",
+            "Best Fit Formula Parameters",
+            "Standard Formula Parameters",
         ],
         refresh=False,
         bootstraps=4000,
@@ -45,13 +45,13 @@ chinchilla_fits_df.columns = [
 ]
 chinchilla_tokens_per_parameter_df_replacement_columns = []
 for column in chinchilla_tokens_per_parameter_df.columns:
-    if column.startswith("Incorrect Eqn. Parameters"):
+    if column.startswith("Best Fit Formula Parameters"):
         chinchilla_tokens_per_parameter_df_replacement_columns.append(
-            column.replace("Incorrect Eqn. Parameters", "Best Fit Formula Parameters")
+            column.replace("Best Fit Formula Parameters", "Best Fit Formula Parameters")
         )
-    elif column.startswith("Correct Eqn. Parameters"):
+    elif column.startswith("Standard Formula Parameters"):
         chinchilla_tokens_per_parameter_df_replacement_columns.append(
-            column.replace("Correct Eqn. Parameters", "Correct Formula Parameters")
+            column.replace("Standard Formula Parameters", "Correct Formula Parameters")
         )
     else:
         chinchilla_tokens_per_parameter_df_replacement_columns.append(column)

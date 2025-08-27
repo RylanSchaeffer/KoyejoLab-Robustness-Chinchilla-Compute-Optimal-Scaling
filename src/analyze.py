@@ -398,28 +398,28 @@ def load_chinchilla_model_parameters_csv() -> pd.DataFrame:
     chinchilla_parameters_df["Reported Parameters"] = (
         1e6 * chinchilla_parameters_df["Reported Parameters (M)"]
     )
-    chinchilla_parameters_df["Incorrect Eqn. Parameters"] = (
+    chinchilla_parameters_df["Best Fit Formula Parameters"] = (
         1e6
         * chinchilla_parameters_df[
             "Tied (Un)Embed, No Gating, Incorrect Attn Params Prefactor"
         ]
     )
-    chinchilla_parameters_df["Correct Eqn. Parameters"] = (
+    chinchilla_parameters_df["Standard Formula Parameters"] = (
         1e6 * chinchilla_parameters_df["Tied (Un)Embed, No Gating"]
     )
-    chinchilla_parameters_df["Relative Error Correct Eqn."] = (
+    chinchilla_parameters_df["Relative Error Standard Formula"] = (
         100.0
         * (
             chinchilla_parameters_df["Reported Parameters"]
-            - chinchilla_parameters_df["Correct Eqn. Parameters"]
+            - chinchilla_parameters_df["Standard Formula Parameters"]
         )
         / chinchilla_parameters_df["Reported Parameters"]
     )
-    chinchilla_parameters_df["Relative Error Incorrect Eqn."] = (
+    chinchilla_parameters_df["Relative Error Best Fit Formula"] = (
         100.0
         * (
             chinchilla_parameters_df["Reported Parameters"]
-            - chinchilla_parameters_df["Incorrect Eqn. Parameters"]
+            - chinchilla_parameters_df["Best Fit Formula Parameters"]
         )
         / chinchilla_parameters_df["Reported Parameters"]
     )

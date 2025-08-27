@@ -24,8 +24,8 @@ chinchilla_parameters_relative_error_tall_df = chinchilla_parameters_df[
     [
         "Reported Parameters",
         "Relative Error Reported Parameters",
-        "Relative Error Correct Eqn.",
-        "Relative Error Incorrect Eqn.",
+        "Relative Error Standard Formula",
+        "Relative Error Best Fit Formula",
     ]
 ].melt(
     id_vars="Reported Parameters",
@@ -37,8 +37,8 @@ chinchilla_parameters_relative_error_tall_df[
 ] = chinchilla_parameters_relative_error_tall_df["Equation"].map(
     {
         "Relative Error Reported Parameters": "Reported",
-        "Relative Error Correct Eqn.": "Correct Formula",
-        "Relative Error Incorrect Eqn.": "Best Fit Formula",
+        "Relative Error Standard Formula": "Standard Formula",
+        "Relative Error Best Fit Formula": "Best Fit Formula",
     }
 )
 chinchilla_parameters_relative_error_tall_df["Relative Error Is Zero"] = (
@@ -73,7 +73,7 @@ for equation, subset_df in chinchilla_parameters_relative_error_tall_df.groupby(
 models_parameters_columns_colors = {
     "Reported": plt.cm.viridis(0.0 / 3.0),
     "Best Fit Formula": plt.cm.viridis(1.0 / 3.0),
-    "Correct Formula": plt.cm.viridis(2.0 / 3.0),
+    "Standard Formula": plt.cm.viridis(2.0 / 3.0),
 }
 plt.close()
 g = sns.relplot(
@@ -84,7 +84,7 @@ g = sns.relplot(
     hue="Equation",
     palette=models_parameters_columns_colors,
     col="Equation",
-    col_order=["Correct Formula", "Best Fit Formula"],
+    col_order=["Standard Formula", "Best Fit Formula"],
     # style="Relative Error Is Zero",
     # size="Relative Error Is Zero",
     # sizes={False: 50, True: 25},
@@ -142,42 +142,6 @@ src.plot.save_plot_with_multiple_extensions(
     plot_dir=results_dir,
     plot_filename="y=relative_error_x=reported_parameters_hue=equation",
 )
-plt.show()
+# plt.show()
 
-# plt.close()
-# plt.figure(figsize=(10, 6))
-# sns.scatterplot(
-#     data=chinchilla_parameters_df,
-#     x="Reported Parameters",
-#     y="Correct Eqn. Parameters",
-#     label="Correct Formula",
-# )
-# g = sns.scatterplot(
-#     data=chinchilla_parameters_df,
-#     x="Reported Parameters",
-#     y="Best Fit Formula Parameters",
-#     label="Best Fit Formula",
-# )
-# plt.plot(
-#     [3.16e7, 3.16e10],
-#     [3.16e7, 3.16e10],
-#     color="black",
-#     linestyle="--",
-# )
-# g.set(
-#     xlim=(3.16e7, 3.16e10),
-#     ylim=(3.16e7, 3.16e10),
-#     xlabel="Reported Parameters",
-#     ylabel="Calculated Parameters",
-#     xscale="log",
-#     yscale="log",
-# )
-# sns.move_legend(g, "upper left", bbox_to_anchor=(1, 1))
-# src.plot.save_plot_with_multiple_extensions(
-#     plot_dir=results_dir,
-#     plot_filename="y=calculated_parameters_x=reported_parameters_hue=equation",
-# )
-# # plt.show()
-
-
-print("Finished 00_correcting_parameters!")
+print("Finished 00_assessing_parameters!")

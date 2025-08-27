@@ -28,7 +28,7 @@ chinchilla_fits_df, chinchilla_tokens_per_parameter_df = (
     src.analyze.compute_or_load_chinchilla_robustness_fit_dataframes(
         data_dir=data_dir,
         models_parameters_columns=[
-            "Correct Eqn. Parameters",
+            "Standard Formula Parameters",
         ],
         # refresh=True,
     )
