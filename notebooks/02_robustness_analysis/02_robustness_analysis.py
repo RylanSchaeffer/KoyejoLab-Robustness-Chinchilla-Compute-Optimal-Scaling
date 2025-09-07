@@ -38,7 +38,7 @@ fit_parameters = ["E", "A", "alpha", "B", "beta"]
 log_normal_noise_columns = [
     col
     for col in chinchilla_fits_df.columns
-    if col.startswith("Correct Eqn. Parameters_Log Normal Noise_")
+    if col.startswith("Standard Formula Parameters_Log Normal Noise_")
 ]
 log_normal_noise_fits_df = chinchilla_fits_df[log_normal_noise_columns].copy()
 log_normal_noise_fits_df.loc["Sigma"] = [
@@ -66,7 +66,7 @@ for log_normal_noise_sigma in sorted(np.unique(log_normal_noise_sigmas)):
         col
         for col in log_normal_noise_columns
         if col.startswith(
-            f"Correct Eqn. Parameters_Log Normal Noise_{log_normal_noise_sigma}"
+            f"Standard Formula Parameters_Log Normal Noise_{log_normal_noise_sigma}"
         )
     ]
     print(f"Log Normal Noise (sigma): {log_normal_noise_sigma}")
@@ -160,7 +160,7 @@ for ax_idx, (ax, fit_parameter) in enumerate(zip(axes, fit_parameters)):
             col
             for col in log_normal_noise_columns
             if col.startswith(
-                f"Correct Eqn. Parameters_Log Normal Noise_{log_normal_noise_sigma}"
+                f"Standard Formula Parameters_Log Normal Noise_{log_normal_noise_sigma}"
             )
         ]
         # Average over the repeats.
@@ -202,7 +202,7 @@ src.plot.save_plot_with_multiple_extensions(
 additive_constant_columns = [
     col
     for col in chinchilla_fits_df.columns
-    if col.startswith("Correct Eqn. Parameters_Additive Constant_")
+    if col.startswith("Standard Formula Parameters_Additive Constant_")
 ]
 additive_constant_fits_df = chinchilla_fits_df[additive_constant_columns].copy()
 additive_constant_fits_df.loc["Constant"] = [
@@ -256,7 +256,7 @@ ax.text(
     fontsize=20,
     verticalalignment="bottom",
 )
-ax.legend(title=r"Constant ($c$)", loc="center left", bbox_to_anchor=(1, 0.5))
+ax.legend(title=r"Constant ($c_a$)", loc="center left", bbox_to_anchor=(1, 0.5))
 fig.subplots_adjust(right=0.8)
 src.plot.save_plot_with_multiple_extensions(
     plot_dir=results_dir,
@@ -317,7 +317,7 @@ for ax_idx, (ax, fit_parameter) in enumerate(zip(axes, fit_parameters)):
             markersize=20,
             linewidth=2,
         )
-    ax.set_xlabel(r"Constant ($c$)")
+    ax.set_xlabel(r"Constant ($c_a$)")
 src.plot.save_plot_with_multiple_extensions(
     plot_dir=results_dir, plot_filename="fit_parameters_additive_constant"
 )
@@ -328,7 +328,7 @@ src.plot.save_plot_with_multiple_extensions(
 multiplicative_constant_columns = [
     col
     for col in chinchilla_fits_df.columns
-    if col.startswith("Correct Eqn. Parameters_Multiplicative Constant_")
+    if col.startswith("Standard Formula Parameters_Multiplicative Constant_")
 ]
 multiplicative_constant_fits_df = chinchilla_fits_df[
     multiplicative_constant_columns
@@ -384,7 +384,7 @@ ax.text(
     fontsize=20,
     verticalalignment="bottom",
 )
-ax.legend(title=r"Constant ($c$)", loc="center left", bbox_to_anchor=(1, 0.5))
+ax.legend(title=r"Constant ($c_m$)", loc="center left", bbox_to_anchor=(1, 0.5))
 fig.subplots_adjust(right=0.8)
 src.plot.save_plot_with_multiple_extensions(
     plot_dir=results_dir,
@@ -454,7 +454,7 @@ for ax_idx, (ax, fit_parameter) in enumerate(zip(axes, fit_parameters)):
         )
 
     ax.set_xscale("log")
-    ax.set_xlabel(r"Constant ($c$)")
+    ax.set_xlabel(r"Constant ($c_m$)")
     ax.set_xlim(1.0 / 3e3, 3e3)
 src.plot.save_plot_with_multiple_extensions(
     plot_dir=results_dir, plot_filename="fit_parameters_multiplicative_constant"
@@ -465,7 +465,7 @@ src.plot.save_plot_with_multiple_extensions(
 systematic_bias_columns = [
     col
     for col in chinchilla_fits_df.columns
-    if col.startswith("Correct Eqn. Parameters_Systematic Bias_")
+    if col.startswith("Standard Formula Parameters_Systematic Bias_")
 ]
 systematic_bias_fits_df = chinchilla_fits_df[systematic_bias_columns].copy()
 # Add a new row with the slope extracted from the column title.
@@ -541,7 +541,7 @@ print(
 plt.plot(x, y)
 plt.xscale("log")
 plt.yscale("log")
-plt.show()
+# plt.show()
 
 # # Check that A_fit decays as a TODO with s.
 # y = [

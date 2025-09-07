@@ -41,7 +41,7 @@ chinchilla_fits_df.columns = [
     "Model Size",
     "Reported Parameters",
     "Best Fit Formula Parameters",
-    "Correct Formula Parameters",
+    "Standard Formula Parameters",
 ]
 chinchilla_tokens_per_parameter_df_replacement_columns = []
 for column in chinchilla_tokens_per_parameter_df.columns:
@@ -51,7 +51,7 @@ for column in chinchilla_tokens_per_parameter_df.columns:
         )
     elif column.startswith("Standard Formula Parameters"):
         chinchilla_tokens_per_parameter_df_replacement_columns.append(
-            column.replace("Standard Formula Parameters", "Correct Formula Parameters")
+            column.replace("Standard Formula Parameters", "Standard Formula Parameters")
         )
     else:
         chinchilla_tokens_per_parameter_df_replacement_columns.append(column)
@@ -62,7 +62,7 @@ chinchilla_tokens_per_parameter_df.columns = (
 
 models_parameters_columns = [
     # "Model Size",
-    "Correct Formula Parameters",
+    "Standard Formula Parameters",
     "Best Fit Formula Parameters",
     "Reported Parameters",
 ]
@@ -73,7 +73,7 @@ models_parameters_columns_colors = {
 models_parameters_columns_markers = {
     "Reported Parameters": "o",
     "Best Fit Formula Parameters": "s",
-    "Correct Formula Parameters": "d",
+    "Standard Formula Parameters": "d",
 }
 fit_parameters = ["E", "A", "alpha", "B", "beta"]
 
