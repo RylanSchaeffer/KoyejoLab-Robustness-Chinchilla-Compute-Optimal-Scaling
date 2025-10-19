@@ -1,7 +1,5 @@
 # Evaluating the Robustness of Chinchilla Compute-Optimal Scaling
 
-![](notebooks/01_epoch_research_fitting/results/compute_optimal_tokens_per_parameter_by_models_parameters.png)
-
 [**Installing**](#installing) | [**Running**](#running) | [**Contributing**](#contributingvlm) | [**Citing**](#citing) | [**Contacting**](#contacting)
 
 
@@ -22,7 +20,7 @@
 
 ## Running
 
-[00_correcting_parameters.py](notebooks/00_assessing_parameters/00_correcting_parameters.py) produces the relative error of reported parameters vs the "correct" equation and vs the "incorrect" equation:
+[00_correcting_parameters.py](notebooks/00_assessing_parameters/00_correcting_parameters.py) produces the relative error of reported parameters vs the "standard" equation and vs the "best-fit" equation:
 
 ![y=relative_error_x=reported_parameters_hue=equation.png](notebooks/00_assessing_parameters/results/y%3Drelative_error_x%3Dreported_parameters_hue%3Dequation.png)
 
