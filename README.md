@@ -1,4 +1,4 @@
-# Chinchilla Compute-Optimal Scaling of Language Models Is Surprisingly Robust
+# Evaluating the Robustness of Chinchilla Compute-Optimal Scaling
 
 ![](notebooks/01_epoch_research_fitting/results/compute_optimal_tokens_per_parameter_by_models_parameters.png)
 
@@ -47,6 +47,15 @@ Contributions are welcome! Please format your code with [black](https://github.c
 To cite this work, please use:
 
 ```bibtex
+@misc{schaeffer2025evaluatingrobustnesschinchillacomputeoptimal,
+      title={Evaluating the Robustness of Chinchilla Compute-Optimal Scaling}, 
+      author={Rylan Schaeffer and Noam Levi and Andreas Kirsch and Theo Guenais and Brando Miranda and Elyas Obbad and Sanmi Koyejo},
+      year={2025},
+      eprint={2509.23963},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2509.23963}, 
+}
 ```
 
 ## Contacting
