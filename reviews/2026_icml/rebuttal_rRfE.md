@@ -4,11 +4,11 @@ We thank the reviewer for recognizing the importance of surfacing ambiguities in
 
 ## Abstract and scope
 
-The abstract overclaims relative to our stated scope. We will temper it — replacing "durable guide for scaling modern models" with language conditioned on the Chinchilla dataset and fitting methods. The intended arc: prior concerns motivated scrutiny, and we found that every single one of Chinchilla's 50 model parameter counts was wrong — discrepancies up to 15.2%, unnoticed for four years. Correcting them changes nothing. We explain why analytically and generalize this into a reusable sensitivity framework.
+The abstract overclaims relative to our stated scope. We will temper it -- replacing "durable guide for scaling modern models" with language conditioned on the Chinchilla dataset and fitting methods. The intended arc: prior concerns motivated scrutiny, and we found that every single one of Chinchilla's 50 model parameter counts was wrong -- discrepancies up to 15.2%, unnoticed for four years. Correcting them changes nothing. We explain why analytically and generalize this into a reusable sensitivity framework.
 
 ## Code validation
 
-We adapted Epoch AI's open-source implementation and validated it three ways: (1) reproducing their published fit parameters, (2) independent analytical cross-checks (Appendix B predictions match simulations — e.g., $\hat{\alpha} = \alpha$ exactly for multiplicative errors, $\hat{\alpha} = \alpha/s$ with $R^2 > 0.999$ for systematic bias), and (3) qualitative consistency across all three parameter-counting formulas.
+We adapted Epoch AI's open-source implementation and validated it three ways: (1) reproducing their published fit parameters, (2) independent analytical cross-checks (Appendix B predictions match simulations -- e.g., $\hat{\alpha} = \alpha$ exactly for multiplicative errors, $\hat{\alpha} = \alpha/s$ with $R^2 > 0.999$ for systematic bias), and (3) qualitative consistency across all three parameter-counting formulas.
 
 ## Limitations
 
@@ -24,7 +24,7 @@ We conjecture Chinchilla internally used a non-standard attention formula (facto
 
 ## Chinchilla still matters
 
-DeepSeek (2024, 2025) and Llama 3 (Grattafiori et al., 2024) both calibrate their training decisions explicitly relative to the Chinchilla compute-optimal point. LLaMA 1 directly applied the tokens-per-parameter heuristic. Even Czech et al. (2026, arXiv:2603.22339), analyzing Approach 2 biases at Llama 3 frontier scale, use Chinchilla as the reference frame. Overtraining and generative scaling laws (Gadre et al., 2024; Schaeffer et al., 2025) define results as deviations from the Chinchilla-optimal point, so the robustness of that baseline is load-bearing. Our diagnostic framework is regime-independent — the analytical relationships hold for any power-law fit.
+DeepSeek (2024, 2025) and Llama 3 (Grattafiori et al., 2024) both calibrate their training decisions explicitly relative to the Chinchilla compute-optimal point. LLaMA 1 directly applied the tokens-per-parameter heuristic. Even Czech et al. (2026, arXiv:2603.22339), analyzing Approach 2 biases at Llama 3 frontier scale, use Chinchilla as the reference frame. Overtraining and generative scaling laws (Gadre et al., 2024; Schaeffer et al., 2025) define results as deviations from the Chinchilla-optimal point, so the robustness of that baseline is load-bearing. Our diagnostic framework is regime-independent -- the analytical relationships hold for any power-law fit.
 
 ## On "trivial experimental conditions"
 
