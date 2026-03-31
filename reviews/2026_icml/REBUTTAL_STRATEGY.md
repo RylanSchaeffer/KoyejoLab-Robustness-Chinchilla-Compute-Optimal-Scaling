@@ -159,7 +159,7 @@ This reframing matters most for EBqg and CheF, who see the paper as confirming w
 
 ### Priority 4: Promote the analytical results from appendix to main text (targets EBqg, CheF)
 
-The analytical results currently buried in Appendix C are the intellectual core of the paper:
+The analytical results currently buried in Appendix B are the intellectual core of the paper:
 - Multiplicative errors are absorbed into prefactors via $\hat{A} \approx A c_m^\alpha$, leaving the exponent and hence the D/N scaling trend invariant. This is a *mathematical proof*, not an empirical observation.
 - Additive errors break the pure power-law form, creating a variable effective slope $N/(N+c_a)$, which the fitter compensates by shifting $\hat{\alpha}$. This *exactly explains* the Pearce & Song and Porian et al. results quantitatively.
 - Systematic bias rescales the exponent as $\hat{\alpha} = \alpha/s$, with $R^2 > 0.999$ empirical fit.
@@ -169,7 +169,7 @@ These results give practitioners a diagnostic tool: if you observe a D/N ratio t
 This directly addresses EBqg's characterization of the paper as "purely an empirical study" — either they missed the appendix theory or found it insufficient because it wasn't foregrounded. It also addresses CheF's ask for "more in-depth theoretical analysis."
 
 **What to do in the rebuttal text:**
-- "We note that the paper does contain theoretical analysis (Appendix C) deriving the exact functional dependence of each fit parameter on each perturbation type — these are not purely empirical observations. We will summarize the key analytical results from the appendix in the main text in the revision."
+- "We note that the paper does contain theoretical analysis (Appendix B) deriving the exact functional dependence of each fit parameter on each perturbation type — these are not purely empirical observations. We will summarize the key analytical results from the appendix in the main text in the revision."
 - "When a practitioner observes that a scaling law's D/N ratio trends with compute, our framework lets them diagnose the cause. If the ratio shifts vertically but stays flat: suspect a multiplicative error. If the ratio tilts (slopes with compute): suspect an additive error or systematic bias. This is a proposed diagnostic framework with concrete practical implications."
 
 **What to do in the revised manuscript:**
@@ -196,7 +196,7 @@ To our knowledge, no prior scaling law paper has performed this kind of sensitiv
 
 **What to do in the rebuttal text:**
 - "Our paper makes a meta-scientific observation: if a foundational result's covariates can be this wrong without affecting conclusions, it raises a practical question about what scaling laws actually measure. The law is fitting something more fundamental than the precise variable we plug in for N. We believe this insight — that power-law scaling captures a coarser regularity than the specific covariate definition — is the most important takeaway."
-- "Furthermore, our perturbation framework is not Chinchilla-specific. We propose that sensitivity analysis of covariate specification should become standard practice in scaling law research. Our four perturbation types (multiplicative, additive, systematic bias, noise) map onto universal error sources, and the analytical toolkit we provide (Appendix C) applies to any power-law fit. To our knowledge, no prior scaling law paper has performed this kind of analysis."
+- "Furthermore, our perturbation framework is not Chinchilla-specific. We propose that sensitivity analysis of covariate specification should become standard practice in scaling law research. Our four perturbation types (multiplicative, additive, systematic bias, noise) map onto universal error sources, and the analytical toolkit we provide (Appendix B) applies to any power-law fit. To our knowledge, no prior scaling law paper has performed this kind of analysis."
 
 **What to do in the revised manuscript:**
 - Add a paragraph to the Discussion making the meta-scientific point explicit: scaling laws are more robust to covariate misspecification than the field assumes, which suggests they capture coarser regularities.
@@ -222,7 +222,7 @@ rRfE wants "a clearer limitations section" — or alternatively, "the authors' c
 
 **What to do in the rebuttal text:**
 - "We will add a Limitations section covering: (1) Our analysis is conditioned on the Chinchilla dataset and fitting methodology — we do not claim extrapolation to modern overtrained regimes; (2) We analyze only parameter-count perturbations, not data-side or optimizer-side sources of error; (3) Our perturbation analysis uses synthetically perturbed covariates, not ground-truth alternative measurements; (4) We scope to parameter-count perturbations precisely because they admit clean counterfactual analysis; data quality, by contrast, lacks a canonical ground-truth metric, making controlled perturbation substantially more challenging."
-- On code validation: "Our code is adapted from Epoch AI's open-source implementation. We verified correctness by reproducing their published fit parameters. Additionally, our analytical predictions (Appendix C) independently confirm the empirical trends, providing a cross-check that does not depend on any particular implementation."
+- On code validation: "Our code is adapted from Epoch AI's open-source implementation. We verified correctness by reproducing their published fit parameters. Additionally, our analytical predictions (Appendix B) independently confirm the empirical trends, providing a cross-check that does not depend on any particular implementation."
 
 **What to do in the revised manuscript:**
 - Add a Limitations paragraph to the Discussion.
@@ -268,10 +268,10 @@ rRfE — and only rRfE — explicitly asks how this work "complements" Porian et
 - "We deliberately held the functional form fixed to isolate the effect of parameter-counting ambiguity. Changing the form simultaneously would confound the analysis. That said, our diagnostic framework reveals when an *apparent* change in functional form is actually an artifact of additive specification errors — precisely the guidance that helps the community distinguish genuine functional-form changes from artifacts of covariate specification."
 
 **CheF Q3 (theory-simulation consistency):**
-- "Our analytical predictions and simulation results are consistent. For multiplicative constants, we prove $\hat{\alpha} = \alpha$ exactly (Appendix C.2.1). For systematic bias, we derive $\hat{\alpha} = \alpha/s$ and empirically observe $R^2 > 0.999$ (Sec. 3.3). For additive constants, we derive the direction and monotonicity of $\hat{\alpha}$'s shift, matching the empirical trend. Divergence occurs only at extreme magnitudes where the fitter encounters numerical issues (NaNs)."
+- "Our analytical predictions and simulation results are consistent. For multiplicative constants, we prove $\hat{\alpha} = \alpha$ exactly (Appendix B.2.1). For systematic bias, we derive $\hat{\alpha} = \alpha/s$ and empirically observe $R^2 > 0.999$ (Sec. 3.3). For additive constants, we derive the direction and monotonicity of $\hat{\alpha}$'s shift, matching the empirical trend. Divergence occurs only at extreme magnitudes where the fitter encounters numerical issues (NaNs)."
 
 **CheF: Data quality and diversity**
 - CheF notes that our Related Work mentions data quality and diversity as relevant to scaling, but the analysis does not consider these factors. "We agree that data quality and diversity are important dimensions of scaling law robustness. Our paper focuses specifically on covariate specification errors (parameter counting) as a controlled, isolable source of uncertainty. We scope to parameter-count perturbations precisely because they admit clean counterfactual analysis — unlike parameter counts, which have well-defined alternative specifications, data quality lacks a canonical ground-truth metric, making controlled perturbation analysis substantially more challenging. This is a principled methodological choice, not an oversight. Extending the sensitivity analysis to data-side perturbations (e.g., data quality filtering thresholds, domain composition) is a natural next step that our perturbation framework could accommodate, and we will note this in the revised manuscript."
 
 **CheF: General novelty concern**
-- CheF characterizes the contribution as "a new fit to the data in Hoffmann et al. (2022)." In the rebuttal: "We note that we do not propose adjusted or revised scaling laws; rather, we investigate how robust the existing law is to corrected and perturbed parameter counts. We respectfully clarify that the three parameter counting formulas are not alternative scaling laws; they are three interpretations of the same model architectures. The perturbation analysis then generalizes beyond any specific formula to characterize the sensitivity of power-law fits to covariate misspecification, yielding analytical results (Appendix C) that apply broadly."
+- CheF characterizes the contribution as "a new fit to the data in Hoffmann et al. (2022)." In the rebuttal: "We note that we do not propose adjusted or revised scaling laws; rather, we investigate how robust the existing law is to corrected and perturbed parameter counts. We respectfully clarify that the three parameter counting formulas are not alternative scaling laws; they are three interpretations of the same model architectures. The perturbation analysis then generalizes beyond any specific formula to characterize the sensitivity of power-law fits to covariate misspecification, yielding analytical results (Appendix B) that apply broadly."
