@@ -4,7 +4,7 @@ We thank the reviewer for their constructive feedback. Both concerns are well-ta
 
 ## Introductory framing
 
-The introduction conflates our contribution with prior concerns (wide confidence intervals, cross-approach inconsistencies) that we do not actually address. We are not claiming parameter-count ambiguity caused those issues. The intended arc is: prior concerns motivated close scrutiny of the original data; in doing so, we found a *new* problem — all 50 parameter counts in Table A9 are ambiguous, with discrepancies up to 15.2% — and then showed the conclusions survive, explained why analytically, and generalized this into a reusable sensitivity methodology. The revision will make this arc explicit and temper the abstract to match the stated scope.
+The introduction conflates our contribution with prior concerns (wide confidence intervals, cross-approach inconsistencies) that we do not actually address. We are not claiming parameter-count ambiguity caused those issues. The intended arc is: prior concerns motivated close scrutiny of the original data; in doing so, we found a *new* problem — every single one of the 50 model parameter counts in Chinchilla's Table A9 is wrong, with discrepancies up to 15.2%, and nobody noticed for four years. One would expect this to matter. It does not. We explain why analytically and generalize this into a reusable sensitivity methodology. The revision will make this arc explicit and temper the abstract to match the stated scope.
 
 ## Figure 5 and the meaning of "robust"
 

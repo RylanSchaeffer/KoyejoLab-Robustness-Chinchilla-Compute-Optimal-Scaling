@@ -4,7 +4,7 @@ We appreciate the reviewer's engagement and the acknowledgment that the directio
 
 ## Practitioner adoption does not test what we test
 
-Adoption tells us the law *works in practice*. It does not tell us whether the prescriptions would change if the parameter counts were defined differently. These are orthogonal questions. Every one of the 50 parameter counts in Chinchilla's Table A9 was ambiguous — discrepancies up to 15.2% — and this went unnoticed for four years. A 15% systematic error in a key covariate of a power-law fit could, in principle, distort the exponents and shift the resulting prescriptions. It does not. Understanding *why* is the contribution, and no prior work provides a systematic framework for answering: "how wrong can a scaling law's inputs be before its outputs break?"
+Adoption tells us the law *works in practice*. It does not tell us whether the prescriptions would change if the parameter counts were defined differently. These are orthogonal questions. The core finding of this paper is that the most influential scaling paper in the field got every single one of its 50 model parameter counts wrong — discrepancies up to 15.2% — and nobody noticed for four years, across hundreds of papers that built on these numbers. A 15% systematic error in a key covariate of a power-law fit should, in principle, distort the exponents and shift the prescriptions. It does not. Understanding *why* is the contribution, and no prior work provides a framework for answering: "how wrong can a scaling law's inputs be before its outputs break?"
 
 ## The paper is not purely empirical
 

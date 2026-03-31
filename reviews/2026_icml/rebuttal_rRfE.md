@@ -4,7 +4,7 @@ We thank the reviewer for recognizing the importance of surfacing ambiguities in
 
 ## Abstract and scope
 
-The abstract overclaims relative to our stated scope. We will temper it — replacing "durable guide for scaling modern models" with language conditioned on the Chinchilla dataset and fitting methods. The intended arc: prior concerns motivated scrutiny, we found a *new* problem (all 50 parameter counts ambiguous, up to 15.2%), showed the conclusions survive, and generalized this into a reusable sensitivity framework.
+The abstract overclaims relative to our stated scope. We will temper it — replacing "durable guide for scaling modern models" with language conditioned on the Chinchilla dataset and fitting methods. The intended arc: prior concerns motivated scrutiny, and we found that every single one of Chinchilla's 50 model parameter counts was wrong — discrepancies up to 15.2%, unnoticed for four years. Correcting them changes nothing. We explain why analytically and generalize this into a reusable sensitivity framework.
 
 ## Code validation
 
