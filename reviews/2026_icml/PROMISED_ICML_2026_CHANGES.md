@@ -74,4 +74,4 @@ Changes promised in the ICML 2026 rebuttals that must be implemented in the revi
 ## New Citations
 
 - [ ] Cite Czech et al. (2026, arXiv:2603.22339), "Problems with Chinchilla Approach 2: Systematic Biases in IsoFLOP Parabola Fits" — complementary analysis of Approach 2 biases at Llama 3 frontier scale; their digitized Llama 3 IsoFLOP data as a future test bed
-- [ ] Cite Schaeffer, Levi, Miranda & Koyejo (2025), "Pretraining Scaling Laws for Generative Evaluations of Language Models" (arXiv:2509.XXXXX) — overtraining and generative scaling laws that define results as deviations from the Chinchilla compute-optimal point, supporting the argument that Chinchilla remains load-bearing for modern scaling work
+- [ ] Cite Schaeffer, Levi, Miranda & Koyejo (2025), "Pretraining Scaling Laws for Generative Evaluations of Language Models" (arXiv:2509.24012) — overtraining and generative scaling laws that define results as deviations from the Chinchilla compute-optimal point, supporting the argument that Chinchilla remains load-bearing for modern scaling work
