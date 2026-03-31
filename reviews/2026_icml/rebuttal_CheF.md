@@ -1,70 +1,29 @@
 # Rebuttal to Reviewer CheF
 
-We thank Reviewer CheF for their thorough evaluation and substantive questions. We are glad the reviewer finds that the paper provides "a detailed discussion of the Chinchilla scaling laws" and that the perturbation experiments "verify the stability" of the scaling laws. Below, we address each concern in turn.
+We appreciate the thorough evaluation and substantive questions.
 
-## Clarifying the Paper's Contribution
+## Clarification: robustness audit, not scaling law revision
 
-Our paper is a robustness audit, not a scaling law revision. We ask: "If the inputs to the Chinchilla fit were wrong in structured ways, would the outputs change?" The answer is no, and we explain analytically why.
+We ask: "if the inputs to the Chinchilla fit were wrong in structured ways, would the outputs change?" The answer is no, and we explain analytically why. The three parameter-counting formulas are not alternative scaling laws — they are three equally valid interpretations of the same architectures. The perturbation analysis generalizes beyond any specific formula to characterize how power-law fits respond to covariate misspecification. All 50 parameter counts in Table A9 were ambiguous (up to 15.2%) for four years. That the conclusions survive suggests power-law scaling captures something more fundamental than the precise variable plugged in for $N$.
 
-Reviewer CheF's summary characterizes the paper as trying to "adjust the Chinchilla scaling laws" — we want to clarify the distinction, as it bears on both novelty and scope. The three parameter-counting formulas we evaluate are not alternative scaling laws; they are three equally valid interpretations of the same model architectures. The perturbation analysis then generalizes beyond any specific formula to characterize the sensitivity of power-law fits to covariate misspecification, yielding analytical results that apply broadly. Every single one of the 50 model parameter counts in Chinchilla's Table A9 was ambiguous, with discrepancies reaching 15.2%, unnoticed for four years. Understanding *why* the conclusions survive this is the intellectual contribution — and it suggests that power-law scaling captures regularities robust to moderate covariate misspecification, fitting something more fundamental than the precise variable we plug in for $N$.
+The paper's novel contributions are: (a) first identification of the internal parameter-count ambiguity within Chinchilla's own data (prior works addressed discrepancies *between* Chinchilla and Kaplan); (b) systematic four-family perturbation analysis spanning realistic covariate error sources; (c) analytical derivations (Appendix B) explaining *why* the law is robust and *when* it breaks; and (d) a diagnostic framework for distinguishing specification artifacts from genuine scaling law failures. To our knowledge, no prior scaling law paper has performed systematic covariate sensitivity analysis. Czech et al. (2026, arXiv:2603.22339) independently analyze Chinchilla's Approach 2 at Llama 3 frontier scale — complementary to our Approach 3 analysis.
 
-## Novel Contributions
+## Theoretical analysis
 
-In response to the reviewer's concern about originality, we enumerate the paper's novel contributions:
+Appendix B (to be promoted to the main text) proves: multiplicative errors are absorbed into the prefactor via $\hat{A} \approx A \cdot c_m^\alpha$, leaving the exponent invariant; additive errors create a variable effective slope $N/(N+c_a)$ that shifts $\hat{\alpha}$ (quantitatively consistent with Pearce & Song and Porian et al.); systematic bias rescales the exponent as $\hat{\alpha} = \alpha/s$ with $R^2 > 0.999$.
 
-- **(a) First identification of internal parameter-count ambiguity within Chinchilla's own Table A9.** Prior works (Porian et al., 2024; Pearce & Song, 2024) identified specific accounting decisions explaining discrepancies *between* Chinchilla and Kaplan. We discovered a previously unnoticed ambiguity *within* Chinchilla's own reported data.
-- **(b) Systematic four-family perturbation analysis spanning realistic covariate error sources.** Multiplicative constants, additive constants, systematic bias, and log-normal noise map onto universal sources of covariate error in any scaling law study — not just Chinchilla.
-- **(c) Analytical derivations explaining how each perturbation type distorts fitted parameters.** These are mathematical results (Appendix B), not purely empirical observations. They explain *why* the law is robust and *when* it breaks.
-- **(d) A proposed diagnostic framework for distinguishing specification artifacts from genuine scaling law failures.** When a practitioner observes that a scaling law's D/N ratio trends with compute, the framework lets them diagnose the cause: a flat vertical shift suggests multiplicative error; a tilt with compute suggests additive error or systematic bias; noisy scatter with a stable median suggests random measurement error.
+## Data quality and diversity
 
-To our knowledge, no prior scaling law paper has performed systematic covariate sensitivity analysis — this is a novel methodological contribution. We propose this should become standard practice for scaling law papers deriving prescriptions — including work on data repetition (Muennighoff et al.), overtraining (Gadre et al.), inference-optimal scaling (Sardana et al.), and MoE scaling, among others. The perturbation taxonomy and analytical toolkit we provide are not Chinchilla-specific; they apply to any power-law fit. We also note that concurrent work by Czech et al. (2026, arXiv:2603.22339) identifies systematic biases in Chinchilla's Approach 2 (IsoFLOP parabola fits) at Llama 3 frontier scale — a complementary analysis to ours, which focuses on Approach 3 following Epoch AI.
+We scope to parameter-count perturbations because they admit clean counterfactual analysis — parameter counts have well-defined alternative specifications, whereas data quality lacks a canonical metric. This is a principled methodological choice. Extending to data-side perturbations is a natural next step we will note in the revision.
 
-## Addressing "More In-Depth Theoretical Analysis"
+## Key questions
 
-The paper does contain theoretical analysis in Appendix B that we will promote into the main text in the revision. The key results are:
+**Additional data (Q1):** No other paper publishes per-model losses at the granularity of Table A9. Czech et al. (2026) recently digitized Llama 3 IsoFLOP loss curves, which could serve as an independent test bed in future work.
 
-- **Multiplicative error absorption:** We prove that multiplicative specification errors are absorbed into the prefactor via $\hat{A} \approx A \cdot c_m^\alpha$, leaving the scaling exponent — and hence the D/N scaling trend — invariant. This is a mathematical result, not an empirical one.
-- **Additive error and variable slope:** Additive errors break the pure power-law form, creating a variable effective slope $N/(N+c_a)$, which the fitter compensates by shifting $\hat{\alpha}$. This analytically explains the direction and monotonicity of the shift. Notably, this is quantitatively consistent with the findings of Pearce & Song and Porian et al. as special cases.
-- **Systematic bias exponent rescaling:** We derive $\hat{\alpha} = \alpha / s$ for systematic bias with exponent $s$, and empirically observe $R^2 > 0.999$ agreement between the analytical prediction and the simulation results.
+**Changing functional form (Q2):** We held the form fixed deliberately — changing it simultaneously would confound the analysis. Our framework actually helps here: the additive-constant analysis shows that including/excluding embeddings creates the *appearance* of a slope change even though the functional form is unchanged, guarding against premature functional-form revisions.
 
-These results provide a unifying framework that reproduces and explains the individual findings of prior work, while extending to perturbation types those works did not consider.
+**Theory-simulation consistency (Q3):** The analytical predictions and simulations agree: $\hat{\alpha} = \alpha$ exactly for multiplicative errors, $\hat{\alpha} = \alpha/s$ for systematic bias ($R^2 > 0.999$), correct direction and monotonicity for additive errors. Divergence occurs only at perturbation magnitudes far beyond any realistic scenario.
 
-## Data Quality and Diversity (Weakness 2)
+## Limitations
 
-The reviewer correctly notes that our Related Work section discusses data quality and diversity, but the analysis focuses on parameter counts. We scope to parameter-count perturbations precisely because they admit clean counterfactual analysis: parameter counts have well-defined alternative specifications (e.g., including or excluding embeddings), whereas data quality lacks a canonical metric, making controlled perturbation substantially harder. This is a principled methodological choice, not an oversight. That said, extending the sensitivity analysis to data-side perturbations (e.g., data quality filtering thresholds, domain composition) is a natural next step that our perturbation framework could accommodate, and we will note this in the revision.
-
-## Key Question 1: Additional Data Points
-
-At the time of submission, no other paper had published per-model pretraining losses at the granularity of Chinchilla's Table A9. Scaling law papers (e.g., LLaMA, DeepSeek) report aggregate trends but not the per-configuration data needed to re-fit the law. We acknowledge this as a limitation. However, a recent preprint — Czech et al. (2026, arXiv:2603.22339) — digitizes Llama 3 IsoFLOP loss curves from Grattafiori et al. (2024) and publishes the extracted per-model data, which could serve as an independent test bed for our perturbation framework in future work.
-
-## Key Question 2: Changing the Functional Form
-
-We deliberately held the functional form fixed to isolate the effect of parameter-counting ambiguity. Changing the functional form simultaneously would confound the analysis — any observed difference could be attributed to either the new form or the new parameter counts, and the two effects could not be disentangled.
-
-Moreover, our diagnostic framework helps distinguish genuine functional-form changes from artifacts of covariate specification. For example, our additive-constant analysis shows that including or excluding embedding parameters creates the *appearance* of a slope change in the D/N ratio, even though the underlying functional form has not changed. Without this kind of controlled analysis, a practitioner who observes such a slope change might incorrectly conclude the functional form needs revision, when the real issue is an accounting choice. This insight — that apparent functional-form changes can be artifacts of specification errors — itself justifies the single-form approach.
-
-## Key Question 3: Theory-Simulation Consistency
-
-Our analytical predictions and simulation results are consistent. Specifically:
-
-- For **multiplicative constants**, we prove $\hat{\alpha} = \alpha$ exactly (Appendix B.2.1), and the simulations confirm invariance of the exponent across the tested range.
-- For **systematic bias**, we derive $\hat{\alpha} = \alpha / s$ and empirically observe agreement consistent with the $R^2 > 0.999$ reported above (Section 3.3).
-- For **additive constants**, we derive the direction and monotonicity of $\hat{\alpha}$'s shift, and the simulation results match the predicted trend.
-
-Divergence occurs only at perturbation magnitudes far exceeding any realistic scenario, where the optimization landscape becomes degenerate. These edge cases lie well outside any realistic perturbation regime and do not affect the paper's conclusions.
-
-## Limitations Section
-
-The reviewer correctly notes that the paper lacks a dedicated limitations section. We will add one in the revision, covering:
-
-1. Our analysis is conditioned on the Chinchilla dataset and fitting methodology — we do not claim extrapolation to modern overtrained regimes.
-2. We analyze only parameter-count perturbations, not data-side or optimizer-side sources of error.
-3. Our perturbation analysis uses synthetically perturbed covariates, not ground-truth alternative measurements from independent training runs.
-4. The Chinchilla dataset is the only publicly available dataset at sufficient granularity for this analysis, limiting our ability to cross-validate on independent data.
-
-## Summary of Planned Revisions
-
-- Promote the key analytical results from Appendix B into the main text to make the theoretical contributions visible alongside the empirical analysis.
-- Add a dedicated Limitations section addressing scope and boundary conditions.
-- Add a "Diagnostic Framework" paragraph to the Discussion, synthesizing the perturbation results into actionable guidance for practitioners.
-- Rewrite the introduction to clearly distinguish our contribution from prior concerns and accurately convey the narrative arc.
+We will add a dedicated section covering: conditioning on Chinchilla's dataset and fitting methodology; scope limited to parameter-count perturbations; synthetic perturbation design; and reliance on Epoch AI's implementation (validated by reproducing their published coefficients and by independent analytical cross-checks).
