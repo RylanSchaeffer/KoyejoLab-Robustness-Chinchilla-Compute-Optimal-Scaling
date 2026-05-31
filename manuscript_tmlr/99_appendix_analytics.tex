@@ -1,0 +1,180 @@
+\section{Theoretical Analysis}
+\label{app:theoretical_analysis}
+
+Here, we provide a detailed analysis of the empirical results obtained in the main text from a theoretical perspective. We begin by repeating the derivation of the baseline compute-optimal scaling for the number of tokens as a function of model parameters, and continue to systematically work through the perturbations discussed in~\cref{sec:robustness_analysis}.
+
+\subsection{Baseline Compute-Optimal Scaling Derivation}
+\label{app:theoretical_analysis:subsec:baseline}
+
+The Chinchilla scaling law for pretraining loss $L$ as a function of non-embedding model parameters $N$ and number of training tokens $D$ is given by~\cref{eqn:scaling_law}, which we repeat here
+\begin{equation}
+    L(N, D) = E + \frac{A}{N^\alpha} + \frac{B}{D^\beta},
+\end{equation}
+where $E$ is the irreducible loss, and $(A, \alpha)$ and $(B, \beta)$ are parameters for the model size and data scaling terms, respectively.
+
+The training compute budget $C$ is approximately proportional to the product of model size and training data, $C \approx c ND$, where $c>0$ is some constant factor. This allows us to express the number of training tokens as a function of compute and model size: $D = C / (c N)$. Substituting this into the loss function yields the loss for a fixed compute budget
+\begin{equation}
+\label{eq:fixed_budget_loss}
+    L(N, C) = E + A N^{-\alpha} + B \left(\frac{C}{c N}\right)^{-\beta} = E + A N^{-\alpha} + B(c^\beta C^{-\beta}) N^\beta.
+\end{equation}
+
+The optimal model size $N_{\text{opt}}$ that minimizes the loss for a fixed compute budget $C$ is simply found by differentiating~\cref{eq:fixed_budget_loss} with respect to $N$ and setting the derivative to zero
+\begin{equation}
+    \frac{\partial L}{\partial N} = - \alpha A N^{-(\alpha+1)} + \beta B (c^\beta C^{-\beta}) N^{\beta-1} = 0.
+\end{equation}
+Rearranging this equation reveals the optimal trade-off:
+\begin{equation}
+    \alpha A N_{\text{opt}}^{-(\alpha+1)} = \beta B (c^\beta C^{-\beta}) N_{\text{opt}}^{\beta-1}.
+\end{equation}
+Solving for $N_{\text{opt}}$:
+\begin{equation}
+    N_{\text{opt}}^{\alpha+\beta} = 
+    \frac{\alpha A}{\beta B c^\beta} C^\beta 
+    \implies 
+    N_{\text{opt}} =
+    \left( \frac{\alpha A}{\beta B c^\beta} \right)^{\frac{1}{\alpha+\beta}} C^{\frac{\beta}{\alpha+\beta}}
+\end{equation}
+
+The compute-optimal tokens-per-parameter ratio is $R_{\text{opt}} = D_{\text{opt}} / N_{\text{opt}}$. Using $D_{\text{opt}} = C / (c N_{\text{opt}})$, we find $R_{\text{opt}} = C / (c N_{\text{opt}}^2)$. Substituting our expression for $N_{\text{opt}}$ results in 
+\begin{equation}
+    R_{\text{opt}} = \frac{C}{c} \left[ \left( \frac{\alpha A}{\beta B c^\beta} \right)^{\frac{1}{\alpha+\beta}} C^{\frac{\beta}{\alpha+\beta}} \right]^{-2} = \frac{C}{c} \left( \frac{\beta B c^\beta}{\alpha A} \right)^{\frac{2}{\alpha+\beta}} C^{\frac{-2\beta}{\alpha+\beta}}.
+\end{equation}
+This simplifies to the final form, which shows the ratio's dependence on the compute budget $C$ as
+\begin{equation}
+    \frac{D_{\text{opt}}}{N_{\text{opt}}} = K \cdot C^{\frac{\alpha-\beta}{\alpha+\beta}},
+    \label{eq:ratio}
+\end{equation}
+where $K = \frac{1}{c} \left( \frac{\beta B c^\beta}{\alpha A} \right)^{\frac{2}{\alpha+\beta}}$ is a constant. The key insight from the Chinchilla works is that empirically, one finds that $\alpha \approx \beta$, making the exponent on $C$ approximately zero and the optimal ratio nearly constant. In mathematical terms, it leads to the relation
+\begin{equation}
+    \frac{D_{\text{opt}}}{N_{\text{opt}}} \approx K =
+    % \frac{1}{6}
+    % \left( \frac{ B 6^\alpha}{ A} \right)^{\frac{1}{\alpha}}.
+    \left( \frac{ B }{ A} \right)^{\frac{1}{\alpha}}.
+    \label{eq:empirical_ratio}
+\end{equation}
+If we want to recover the $20:1$ ratio of training tokens to number of parameters we expect to find that $B \approx 2.85 A$ for $\alpha \approx 0.35$.
+
+\subsection{Analysis of Perturbations}
+We now analyze how systematic errors in model parameter counts affect the fitted scaling parameters $(\hat{A}, \hat{\alpha})$ and the resulting optimal ratio. Let $N$ be the true parameter count and $\tilde{N}$ be the perturbed (incorrect) count used for fitting. The fitting process minimizes the error between the model $L(\tilde{N}, D) = \hat{E} + \hat{A}\tilde{N}^{-\hat{\alpha}} + \hat{B}D^{-\hat{\beta}}$ and the observed losses. For most types of perturbations we consider, since the data $D$ is unaffected, we assume $\hat{B} \approx B$ and $\hat{\beta} \approx \beta$. We will break this assumption when necessary.
+
+\subsubsection{Multiplicative Constant Perturbation}
+\label{app:theoretical_analysis:subsec:multiplicative}
+
+Assume the reported parameters are a constant multiple of the true parameters: $\tilde{N} = c_m \cdot N$. The model size term in the loss is modified to
+\begin{equation}
+\label{eqn:multi_constant}
+    \hat{A} \tilde{N}^{-\hat{\alpha}} = \hat{A} (c_m N)^{-\hat{\alpha}} = (\hat{A} c_m^{-\hat{\alpha}}) N^{-\hat{\alpha}}.
+\end{equation}
+For \cref{eqn:multi_constant} to match the true term $A N^{-\alpha}$, the fitting procedure will ideally find parameters such that:
+\begin{itemize}
+    \item $\hat{\alpha} \approx \alpha$
+    \item $\hat{A} c_m^{-\hat{\alpha}} \approx A \implies \hat{A} \approx A c_m^{\alpha}$
+\end{itemize}
+The exponent in the optimal ratio (\ref{eq:ratio}) becomes $(\hat{\alpha} - \beta)/(\hat{\alpha} + \beta) \approx (\alpha - \beta)/(\alpha + \beta)$.
+
+\textbf{Conclusion:} A multiplicative error does not change the exponent governing the trend of the optimal ratio. The flat relationship with compute budget is preserved. However, the constant prefactor $K$ is shifted by a factor of $(c_m^\alpha)^{-2/(\alpha+\beta)} = c_m^{-2\alpha/(\alpha+\beta)}\approx c_m^{-1}$, which shifts the entire line up or down on a log-log plot. This is shown in Fig.~\ref{fig:perturbed_fits} (top row) and Fig.~\ref{fig:perturbed_compute_optimal_tpp} (top left).
+
+%%%START THEO
+%\theo{Alternative proof - slightly more rigorous}
+
+%Consider Chinchilla's paper equation 11 (also find below for completeness).
+
+%Let 
+%\begin{align}
+%F(a, b, \alpha, \beta, e) &= \sum_{i} \text{Huber}_\delta(\text{LSE}_e(a - \alpha \log N_i, b - \beta \log D_i) - \log L_i) \\
+%F_{c_m}(a, b, \alpha, \beta, e) &= \sum_{i} \text{Huber}_\delta(\text{LSE}_e(a - \alpha \log (c_m\cdot N_i), b - \beta \log D_i) - \log L_i)
+%\end{align}
+
+%If $(a^*, b^*, \alpha^*, \beta^*, e^*)$ minimizes $F$, then for any point $(a, b, \alpha, \beta, e)$:
+%\begin{equation}
+%F(a^*, b^*, \alpha^*, \beta^*, e^*) \leq F(a, b, \alpha, \beta, e)
+%\end{equation}
+
+
+%Knowing that $F_{c_m}(a, b, \alpha, \beta, e) = F(a - \alpha \log(c_m), b, \alpha, \beta, e)$, for any $(a, b, \alpha, \beta, e)$:
+%\begin{align}
+%F_{c_m}(a^* + \alpha^* \log(c_m), b^*, \alpha^*, \beta^*, e^*) &= F(a^*, b^*, \alpha^*, \beta^*, e^*) \\
+%&\leq F(a - \alpha \log(c_m), b, \alpha, \beta, e) \\
+%&= F_{c_m}(a, b, \alpha, \beta, e)
+%\end{align}
+
+%Therefore $(a^* + \alpha^* \log(c_m), b^*, \alpha^*, \beta^*, e^*)$ minimizes $F_{c_m}$.
+
+%Conversely, if $(\tilde{a}, \tilde{b}, \tilde{\alpha}, \tilde{\beta}, \tilde{e})$ minimizes $F_{c_m}$, then $(\tilde{a} - \tilde{\alpha} \log(c_m), \tilde{b}, \tilde{\alpha}, \tilde{\beta}, \tilde{e})$ minimizes $F$.
+
+%This establishes a bijection between minimizers (assuming their existence). Using the re-parametrization $A=e^{a}$, we conclude that the new solution to the (perturbed) optimization problem is $e^{(a + \alpha \log cm)} = A c_m^{\alpha}$
+%%%END THEO
+
+
+
+
+\subsubsection{Additive Constant Perturbation}
+\label{app:theoretical_analysis:subsec:additive}
+
+Assume an additive error, e.g., from including/excluding embeddings: $\tilde{N} = N + c_a$. The loss term $\hat{A}(N+c_a)^{-\hat{\alpha}}$ is no longer a pure power law in $N$.
+
+We examine the process of fitting the perturbed model $g(N; \hat{A}, \hat{\alpha}) = \hat{A}(N+c_a)^{-\hat{\alpha}}$ to the true function $f(N) = AN^{-\alpha}$ by minimizing the Mean Squared Error (MSE) in log-space.
+
+The objective is to find $(\hat{A}, \hat{\alpha})$ that minimize $\sum_i [ \log f(N_i) - \log g(N_i) ]^2$.
+The core of the problem lies in approximating the term $\log(N+c_a)$. For the regime where $N \gg |c_a|$, which applies to the larger models in the study, we can analyze the local behavior of the function.
+
+\paragraph{Effect on the Scaling Exponent $\hat{\alpha}$:}
+The most critical parameter in a power law is its exponent, which corresponds to the slope in a log-log plot. The true slope is constant
+\begin{equation}
+    \frac{d(\log f(N))}{d(\log N)} = -\alpha
+\end{equation}
+For the perturbed function, the effective slope is not constant and depends on $N$ as
+\begin{align}
+    \text{Effective Slope}(N) &= \frac{d(\log g(N))}{d(\log N)} = -\hat{\alpha} \frac{d(\log(N+c_a))}{d(\log N)} = -\hat{\alpha} \left( \frac{N}{N+c_a} \right)
+    \\ \nonumber
+    &\implies \hat{\alpha}=\alpha/\left( \frac{N}{N+c_a} \right).
+\end{align}
+The fitting procedure must select a single exponent $\hat{\alpha}$ that best represents this varying slope over the range of data. To match the true average slope of $-\alpha$, the fitted $\hat{\alpha}$ must compensate for the factor $N/(N+c_a)$:
+\begin{itemize}
+    \item When $c_a > 0$, the factor $N/(N+c_a) < 1$. To achieve the target slope, the fitting process must select an exponent $\hat{\alpha} > \alpha$.
+    \item When $c_a < 0$, the factor $N/(N+c_a) > 1$ (for $N>|c_a|$). To compensate, the fitting process must select an exponent $\hat{\alpha} < \alpha$.
+\end{itemize}
+This provides a direct analytical explanation for the observed behavior of $\hat{\alpha}$ in Figure 4, which is smaller than the true $\alpha$ for $c_a<0$ and increases approximately linearly for $c_a>0$.
+
+\paragraph{Effect on the Prefactor $\hat{A}$:}
+Once the optimal $\hat{\alpha}$ is determined, the prefactor $\hat{A}$ is chosen to minimize the remaining offset. We can approximate this by enforcing that the functions match at some effective "pivot" point $N_0$ that is characteristic of the dataset.
+\begin{equation}
+    f(N_0) \approx g(N_0) \implies A N_0^{-\alpha} \approx \hat{A} (N_0+c_a)^{-\hat{\alpha}}.
+\end{equation}
+Solving for $\hat{A}$ gives
+\begin{equation}
+    \hat{A} \approx A \cdot N_0^{-\alpha} \cdot (N_0+c_a)^{\hat{\alpha}} = A \left( \frac{N_0+c_a}{N_0} \right)^{\hat{\alpha}} \left(N_0\right)^{\hat{\alpha}-\alpha}.
+\end{equation}
+Assuming for simplicity that the pivot point is chosen such that the $N_0^{\hat{\alpha}-\alpha}$ term is of order one, we focus on the dominant term
+\begin{equation}
+    \hat{A} \approx A \left( 1 + \frac{c_a}{N_0} \right)^{\hat{\alpha}}.
+\end{equation}
+This relationship explains the rapid growth of $\hat{A}$. Since we have already established that $\hat{\alpha}$ itself increases with $c$, the prefactor $\hat{A}$ grows due to two compounding effects: an increase in the base $(1+c_a/N_0)$ and an increase in the exponent $\hat{\alpha}$. This leads to the exponential-like growth observed empirically in~\cref{fig:perturbed_fits}.
+
+
+
+\subsubsection{Systematic Bias Perturbation}
+\label{app:theoretical_analysis:subsec:systematic}
+
+Assume a bias where the error itself scales with model size, modeled as $\tilde{N} = \mu_{\text{geo}} (N/\mu_{\text{geo}})^s$, where $\mu_{\text{geo}}$ is the geometric mean of the true parameter counts and $s$ is the bias factor. The model size term becomes
+\begin{equation}
+    \hat{A} \tilde{N}^{-\hat{\alpha}} = \hat{A} \left( \mu_{\text{geo}}^{1-s} N^s \right)^{-\hat{\alpha}} = \left(\hat{A} \mu_{\text{geo}}^{-(1-s)\hat{\alpha}}\right) N^{-s\hat{\alpha}}
+\end{equation}
+To match the true term $A N^{-\alpha}$, the exponent and the constant term must satisfy the relations
+\begin{equation}
+    \hat{\alpha} = \frac{\alpha}{s},
+    \quad
+    \hat{A}
+    =
+    \mu_{\text{geo}} ^{\frac{\alpha  (1-s)}{s}} A .
+\end{equation}
+The fitted exponent is inversely proportional to the bias factor $s$, which is verified empirically in~\cref{sec:robustness_analysis:subsec:systematic_bias}. The exponent in the optimal ratio is now $(\alpha/s - \beta)/(\alpha/s + \beta)$.
+
+\textbf{Conclusion:} A systematic bias also breaks the $\hat{\alpha} \approx \beta$ condition, unless $s=1$.
+\begin{itemize}
+    \item If $s < 1$ (inflating larger models relative to smaller ones), then $\hat{\alpha} > \alpha \approx \beta$. The exponent on $C$ becomes positive, and the optimal ratio \textit{increases} with compute.
+    \item If $s > 1$ (shrinking larger models relative to smaller ones), then $\hat{\alpha} < \alpha \approx \beta$. The exponent on $C$ becomes negative, and the optimal ratio \emph{decreases} with compute.
+\end{itemize}
+This perturbation also qualitatively changes the optimal scaling strategy, with the direction of the change depending on the nature of the bias, as seen in \cref{fig:perturbed_compute_optimal_tpp} (bottom left).
+
+\clearpage

@@ -1,0 +1,127 @@
+\documentclass[10pt]{article} % For LaTeX2e
+
+\usepackage{tmlr}
+% If accepted, instead use the following line for the camera-ready submission:
+%\usepackage[accepted]{tmlr}
+% To de-anonymize and remove mentions to TMLR (for example for posting to preprint servers), instead use the following:
+%\usepackage[preprint]{tmlr}
+
+% Optional math commands from https://github.com/goodfeli/dlbook_notation.
+\input{math_commands.tex}
+
+% Recommended, but optional, packages for figures and better typesetting:
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{booktabs} % for professional tables
+\usepackage{multirow}
+\usepackage{makecell}
+
+\usepackage[utf8]{inputenc} % Standard for modern LaTeX
+\usepackage[T1]{fontenc}    % Critical for correct font rendering
+\usepackage{url}            % Better formatting for URLs
+\usepackage{amsfonts}       % Required for blackboard math like \mathbb{R}
+\usepackage{nicefrac}       % Required if you use \nicefrac{1}{2}
+% siunitx for \num{...}/\SI{...}. If the package is unavailable in the local
+% TeX installation, fall back to lightweight definitions so the build succeeds.
+\newif\ifhavesiunitx
+\IfFileExists{siunitx.sty}{\havesiunitxtrue}{\havesiunitxfalse}
+\ifhavesiunitx
+  \usepackage{siunitx}
+\else
+  % Minimal fallback for \num{...} and \SI{...}: render an "e" exponent
+  % (e.g. 5.9e-90) as a times-ten-to-the-power expression.
+  \makeatletter
+  \def\numfb@parse#1e#2\numfb@end{%
+    \def\numfb@exp{#2}%
+    \ifx\numfb@exp\@empty #1\else #1\times 10^{#2}\fi}
+  \providecommand{\num}[1]{\ensuremath{\numfb@parse#1e\numfb@end}}
+  \providecommand{\SI}[2]{\ensuremath{\num{#1}\,\mathrm{#2}}}
+  \makeatother
+\fi
+\usepackage{xargs}          % Required for complex newcommands
+\usepackage{longtable}      % Required if you use multi-page tables
+
+% hyperref makes hyperlinks in the resulting PDF.
+\usepackage{hyperref}
+
+% Attempt to make hyperref and algorithmic work together better:
+\newcommand{\theHalgorithm}{\arabic{algorithm}}
+
+% For theorems and such
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{amsthm}
+
+% if you use cleveref..
+\usepackage[capitalize,noabbrev]{cleveref}
+
+\usepackage{xcolor}
+
+% Comment macros (inactive in the body, defined as simple textcolor versions).
+\newcommand{\rylan}[1]{\textcolor{red}{rylan: #1}}
+\newcommand{\fazl}[1]{\textcolor{orange}{\textbf{[Fazl: #1]}}}
+\newcommand{\stella}[1]{\textcolor{blue}{[\textbf{Stella:} #1] }}
+
+% Custom macros used by the content.
+\newcommand{\expnumber}[2]{{#1}\mathrm{e}{#2}}
+
+\definecolor{legendblue}{RGB}{31, 119, 180}
+\definecolor{legendgreen}{RGB}{44, 160, 44}
+
+
+\title{Miscounted Parameters, Misread Scaling: A Robustness Study of Chinchilla Compute-Optimal Scaling}
+
+% Authors must not appear in the submitted version. They should be hidden
+% as long as the tmlr package is used without the [accepted] or [preprint] options.
+% Non-anonymous submissions will be rejected without review.
+
+\author{\name Rylan Schaeffer \email rschaef@cs.stanford.edu \\
+      \addr Department of Computer Science\\
+      Stanford University
+      \AND
+      \name Brando Miranda \email brando9@stanford.edu \\
+      \addr Department of Computer Science\\
+      Stanford University
+      \AND
+      \name Sanmi Koyejo \email sanmi@cs.stanford.edu \\
+      \addr Department of Computer Science\\
+      Stanford University}
+
+% The \author macro works with any number of authors. Use \AND
+% to separate the names and addresses of multiple authors.
+
+\def\month{MM}  % Insert correct month for camera-ready version
+\def\year{YYYY} % Insert correct year for camera-ready version
+\def\openreview{\url{https://openreview.net/forum?id=XXXX}} % Insert correct link to OpenReview for camera-ready version
+
+
+\begin{document}
+
+
+\maketitle
+
+\begin{abstract}
+\citet{hoffman2022chinchilla} introduced compute-optimal scaling, providing the ``Standard Model'' for scaling frontier language models.
+However, recent concerns regarding wide confidence intervals and inconsistent results have left the field uncertain if Chinchilla’s prescriptions remain reliable. We begin by uncovering a critical specification error: the model parameters central to the original analyses were ambiguous, with definitional discrepancies as high as 15.2\%.
+We find that, perhaps surprisingly, which model parameters are used for the analyses do not meaningfully affect key results: the scaling law estimates and the compute-optimal tokens-to-parameter ratio. Indeed, under one interpretation, the ratio becomes more constant with the target compute budget.
+By systematically perturbing model parameters in four structured ways, we find that key results withstand sizable distortions. Critically, we show that additive specification errors (e.g., miscounting embeddings) mathematically mimic "broken" scaling laws—offering a diagnostic framework to distinguish between functional breakdown and simple accounting artifacts. Our findings offer renewed confidence in Chinchilla as a durable guide for scaling modern models.
+\end{abstract}
+
+\input{01_introduction}
+\input{02_model_params}
+\input{03_robustness_analysis}
+\input{04_discussion}
+
+\subsubsection*{Broader Impact Statement}
+This work is a methodological re-analysis of the parameter accounting underlying Chinchilla compute-optimal scaling laws. It introduces no new models or data and carries minimal direct ethical risk beyond the general considerations associated with scaling large language models.
+
+\bibliography{references_rylan}
+\bibliographystyle{tmlr}
+
+\appendix
+\input{98_appendix_chinchilla_table}
+\input{99_appendix_analytics}
+
+\end{document}
